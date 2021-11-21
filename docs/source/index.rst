@@ -3,9 +3,6 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to FULMAR's documentation!
-==================================
-
 .. image:: FULMAR_logo_title.png
 
 **FULMAR** is a modular tool for analyzing light curves in support of radial velocity follow-up of transiting exoplanets (or astronomers analysing exoplanet transits in general).
@@ -20,10 +17,13 @@ Check out the :doc:`installation` section to start using FULMAR.
 
 .. toctree::
    :maxdepth: 2
-   installation
    :caption: Contents:
 
+   installation
+   api
 
+Todo
+Thank Elisa for the logo   
 
 Indices and tables
 ==================

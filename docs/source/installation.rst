@@ -13,7 +13,7 @@ If you have multiple versions of Python and pip on your machine, make sure to us
 The latest version can be pulled from github::
 
     git clone https://github.com/astrojose9/Fulmar.git
-    cd tls
+    cd fulmar
     python setup.py install
 
 If the command ``python`` does not point to Python 3 on your machine, you can try to replace the last line with ``python3 setup.py install``. If you don't have ``git`` on your machine, you can find installation instructions `here <https://git-scm.com/book/en/v2/Getting-Started-Installing-Git>`_.

@@ -37,7 +37,7 @@ setup(name='fulmar-astro',
       classifiers=['Intended Audience :: Science/Research',
                    'Topic :: Scientific/Engineering :: Astronomy',
                    'Development Status :: 5 - Production/Stable',
-                   'License :: OSI Approved :: MIT License',
+                   'License :: MIT License',
                    'Programming Language :: Python'],
       packages=['fulmar'],
       include_package_data=True,
@@ -45,12 +45,14 @@ setup(name='fulmar-astro',
       install_requires=[
           'arviz',
           # astropy 3 doesn't install in Python 2, but is req for astroquery
-          'astropy<3;python_version<"3"',
-          'astroquery>=0.3.9',
+          'astropy>=3;python_version>"3"',
+          "corner",
           'exoplanet',
-          'lightkurve<2,'
+          'lightkurve>=2,'
+          'matplotlib',
           'numpy',
-          'pathlib',
+          'pymc3',
+          'pym3-ext',
           'transitleastsquares'
       ]
       )
