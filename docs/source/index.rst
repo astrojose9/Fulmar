@@ -1,26 +1,33 @@
+.. FULMAR documentation master file, created by
+   sphinx-quickstart on Sun Nov 21 16:21:23 2021.
+   You can adapt this file completely to your liking, but it should at least
+   contain the root `toctree` directive.
+
 Welcome to FULMAR's documentation!
-===================================
+==================================
 
 .. image:: FULMAR_logo_title.png
 
-**FULMAR** is a modular tool for analyzing light curves in support of radial velocity follow-up of transiting exoplanets.
-It aims at selecting suitable RV follow-up targets more effectively and making their analysis easier. 
-It was build in a modular way, making new features easier to implement.
-
+**FULMAR** is a modular tool for analyzing light curves in support of radial velocity follow-up of transiting exoplanets (or astronomers analysing exoplanet transits in general).
 
 
 Check out the :doc:`installation` section to start using FULMAR.
-
-FULMAR has its documentation hosted on Read the Docs.
 
 .. note::
 
    This project is under active development.
 
-Contents
---------
 
 .. toctree::
-
+   :maxdepth: 2
    installation
-   api
+   :caption: Contents:
+
+
+
+Indices and tables
+==================
+
+* :ref:`genindex`
+* :ref:`modindex`
+* :ref:`search`
