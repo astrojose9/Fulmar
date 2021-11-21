@@ -2,12 +2,12 @@
 
 # -- Project information
 
-project = 'Lumache'
-copyright = '2021, Graziella'
-author = 'Graziella'
+project = 'FULMAR'
+copyright = '2021, José Rodrigues'
+author = 'José Rodrigues'
 
-release = '0.1'
-version = '0.1.0'
+release = ''
+version = ''
 
 # -- General configuration
 
