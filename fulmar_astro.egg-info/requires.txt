@@ -1,0 +1,12 @@
+arviz
+corner
+exoplanet
+lightkurve>=2
+matplotlib
+numpy
+pymc3
+pym3-ext
+transitleastsquares
+
+[:python_version > "3"]
+astropy>=3
