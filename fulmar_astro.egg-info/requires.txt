@@ -1,12 +1,11 @@
 arviz
+astropy==4.3.1
+celerite2
 corner
 exoplanet
 lightkurve>=2
 matplotlib
-numpy
+numpy<1.21,>=1.17
 pymc3
-pym3-ext
-transitleastsquares
-
-[:python_version > "3"]
-astropy>=3
+pymc3-ext
+transitleastsquares>=1.0.31

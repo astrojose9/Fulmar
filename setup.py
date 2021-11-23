@@ -44,15 +44,15 @@ setup(name='fulmar-astro',
       package_data={'': ['*.csv', '*.json']},
       install_requires=[
           'arviz',
-          # astropy 3 doesn't install in Python 2, but is req for astroquery
-          'astropy>=3;python_version>"3"',
+          'astropy==4.3.1',
+          "celerite2",
           "corner",
           'exoplanet',
           'lightkurve>=2',
           'matplotlib',
-          'numpy',
+          'numpy<1.21,>=1.17',
           'pymc3',
-          'pym3-ext',
-          'transitleastsquares'
+          'pymc3-ext',
+          'transitleastsquares>=1.0.31'
       ]
       )

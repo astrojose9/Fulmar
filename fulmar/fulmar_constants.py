@@ -3,7 +3,7 @@
 from os import path
 import fulmar.version as versinfo
 
-"""Mission dictionary"""
+# Mission dictionary
 
 MISSION_DIC = {
     'tess': 'TESS',
@@ -11,7 +11,7 @@ MISSION_DIC = {
     'k2': 'K2'
 }
 
-"""Path for the module"""
+# Path for the module
 fulmar_dir = path.join(path.dirname(__file__))
 
 FULMAR_VERSION_STR = (

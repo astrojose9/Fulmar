@@ -7,15 +7,17 @@ import numpy as np
 
 def rjd_to_astropy_time(rjd) -> Time:
     """Converts Reduced Julian Day (RJD) time values to an
-    `astropy.time.Time` object.
+    `~astropy.time.Time` object.
     R Julian Day (BKJD) is a Julian day minus 2400000.0
     (UTC=January 1, 2000 12:00:00)..
     The time is in the Barycentric Dynamical Time frame (TDB), which is a
     time system that is not affected by leap seconds.
+
     Parameters
     ----------
     rjd : float or array of floats
         Reduced Julian Day.
+
     Returns
     -------
     time : `astropy.time.Time` object
@@ -29,7 +31,7 @@ def rjd_to_astropy_time(rjd) -> Time:
 
 
 class FulmarWarning(Warning):
-    """ Class form warning to be displayed as
+    """Class from warning to be displayed as
     "FulmarWarning"
     """
 
@@ -46,5 +48,6 @@ def warning_on_one_line(message, category, filename, lineno,
 
 # warnings.formatwarning = warning_on_one_line
 def print_version():
+    """prints the version of fulmar used."""
     print(FULMAR_VERSION_STR)
     return

@@ -41,6 +41,7 @@ def read_lc_from_file(
         timeformat=None,
         colnames=None):
     """Creates a LightCurve from a file.
+
     Parameters
     ----------
     file : str
@@ -51,17 +52,15 @@ def read_lc_from_file(
         Exposure time of the observation, in seconds.
     timeformat : str
         Format of the Time values. Should be 'rjd', 'bkjd', 'btjd', or a valid
-        astropy.time format. Refer to the docs here:
+        `~astropy.time.Time` format. Refer to the docs here:
         (https://docs.astropy.org/en/stable/time/index.html#time-format)
     colnames : list (of str) (optional)
         Names of the columns. Should have the same number of
         items as the number of columns.
-    Examples
-    --------
 
     Returns
     -------
-    lc : 'LightCurve'
+    lc : '~lightkurve.lightcurve.LightCurve'
         LightCurve object with data from the file.
     """
     if str(file).split('.')[-1] == 'fits':
@@ -90,7 +89,7 @@ def read_lc_from_file(
                     t_1, time=rjd_to_astropy_time(t_1['no_unit_time']))
             else:
                 ts = TimeSeries(t_1, time=Time(
-                    t_1['no_unit_time'], format='timeformat'))
+                    t_1['no_unit_time'], format=timeformat))
             ts.remove_column('no_unit_time')
 
             lc = lk.LightCurve(ts)
@@ -114,32 +113,22 @@ def read_lc_from_file(
 
 
 def normalize_lc(lc_in, unit='unscaled'):
-    """Returns a normalized version of the light curve.
-    Using robust stats.
+    """Returns a normalized version of the light curve using robust stats.
+
     Parameters
     ----------
-    lc_in : LightCurve
+    lc_in : '~lightkurve.lightcurve.LightCurve'
         LightCurve object.
     unit : 'unscaled', 'percent', 'ppt', 'ppm'
         The desired relative units of the normalized light curve;
         'ppt' means 'parts per thousand', 'ppm' means 'parts per million'.
-    Examples
-    --------
-        >>> import lightkurve as lk
 
-        >>> lc = lk.LightCurve(time=[1, 2, 3],
-                               flux=[25945.7, 25901.5, 25931.2],
-                               flux_err=[6.8, 4.6, 6.2])
-        >>> normalized_lc = normalize_lc(lc)
-        >>> normalized_lc.flux
-        <Quantity [1.00055917, 0.99885466, 1.        ]>
-        >>> normalized_lc.flux_err
-        <Quantity [0.00026223, 0.00017739, 0.00023909]>
     Returns
     -------
-    normalized_lightcurve : `LightCurve`
+    lc : '~lightkurve.lightcurve.LightCurve'
         A new light curve object in which ``flux`` and ``flux_err`` have
         been divided by the median flux.
+
     Warns
     -----
     LightkurveWarning
@@ -196,62 +185,144 @@ def normalize_lc(lc_in, unit='unscaled'):
     return lc
 
 
-def ts_binner(ts, bin_duration):
-    """
-    Wrap around for astropy's aggregate_downsample with centered time
+def time_flux_err(
+        timeseries,
+        flux_kw='flux',
+        flux_err_kw='flux_err',
+        replace_nan_err=True):
+    """Returns 3 arrays with time, flux and flux_err.
+
     Parameters
-        ----------
-        ts : 'TimeSeries'
-            TimeSeries object
-        bin_duration : 'astropy.units.Quantity' or float
-            Time interval for the binned time series.
-            (Default is in units of days)
-        Returns
-        -------
-        ts_binned : 'TimeSeries'
-            TimeSeries which has been binned.
+    ----------
+    timeseries : `~astropy.timeseries.TimeSeries`
+        TimeSeries object
+    flux_kw : str, optional
+        Keyword for the column containing the flux values
+        (Default: 'flux')
+    flux_err_kw : str, optional
+        Keyword for the column containing the flux uncertainty values
+        (Default: 'flux_err')
+    replace_nan_err : bool, optional
+        To deal with the case where the flux_err column is full
+        of NaNs. When True, creates an array filled with the standard
+        deviation of the flux. When false, returns an array full of NaNs.
+        (default : True)
+
+    Returns
+    -------
+    t : array
+        Array of time where values of type NaN, None, inf, and negative
+        have been removed, as well as masks.
+    flux : array
+        Array of flux where values of type NaN, None, inf, and negative
+        have been removed, as well as masks.
+    flux_err : array
+        Array of flux_err where values of type NaN, None, inf,
+        and negative have been removed, as well as masks.
+        If the original was filled with NaNs: if replace_nan_err=True,
+        returns an array filled with the standard deviation of flux.
+        if replace_nan_err=False, returns an array filled with Nans.
+    """
+    t = timeseries.time.value
+    flux = np.array(timeseries[flux_kw], dtype=np.float64)
+    flux_err = np.array(timeseries[flux_err_kw], dtype=np.float64)
+
+    # The case where flux_err is filled with Nan
+    if len(cleaned_array(t, flux, flux_err)[0]) == 0:
+        t, flux = cleaned_array(t, flux)
+
+        if replace_nan_err is True:
+            flux_err = np.full_like(flux, np.std(flux))
+        else:
+            flux_err = np.nan * flux
+    # Case 2: y_err contains (at least some) valid data
+    else:
+        t, flux, flux_err = cleaned_array(t, flux, flux_err)
+
+    return t, flux, flux_err
+
+
+def ts_binner(timeseries, bin_duration):
+    """Wrap around for astropy's aggregate_downsample returning a
+    `~astropy.timeseries.TimeSeries`object with Time at the center of the bins.
+
+    Parameters
+    ----------
+    timeseries : `~astropy.timeseries.TimeSeries`
+        TimeSeries object
+
+    bin_duration : `~astropy.units.Quantity` or float
+        Time interval for the binned time series.
+        (Default is in units of days)
+
+    Returns
+    -------
+    ts_binned : `~astropy.timeseries.TimeSeries`
+        TimeSeries which has been binned.
+        With time corresponding to the center time of all time bins
     """
     if isinstance(bin_duration, float):
         bin_duration = bin_duration * u.d
 
-    ts_binned = aggregate_downsample(ts, time_bin_size=bin_duration)
-    ts_binned['time_bin_mid'] = ts_binned['time_bin_start'] + \
-        ts_binned['time_bin_size'].to(u.d)
-    ts_binned
+    ts_bin = aggregate_downsample(timeseries, time_bin_size=bin_duration)
+    # ts_bin['time_bin_mid'] = ts_bin['time_bin_start'] + \
+    #     ts_bin['time_bin_size'].to(timeseries.time.unit)
+    ts_binned = TimeSeries(ts_bin,
+                           time=ts_bin.time_bin_center)
     return ts_binned
 
 
-def fbn(ts, best_period, epoch0, duration=3 * u.h, nbin=40):
-    """
-    fbn for "fold, bin, norm"
+def fbn(timeseries, period, epoch0, duration=3 * u.h, nbin=40):
+    """fbn for "fold, bin, norm"
 
-    epoch0 : 'astropy.time.Time' or float
-        The time to use as the reference epoch
+    Parameters
+    ----------
+    timeseries : `~astropy.timeseries.TimeSeries`
+        TimeSeries object
+    period : '~astropy.time.Time' or float
+        The period to use for folding.
+    epoch0 : '~astropy.units.Quantity' or float
+        The time to use as the reference epoch.
+    duration : '~astropy.units.Quantity' or float, optional
+        Duration of the transit. (Default is 3 hours)
+    nbin : int, optional
+        Number of bins in the transit window. (Default is 40)
+
+    Returns
+    -------
+    ts_fold : `~astropy.timeseries.TimeSeries`
+        The folded time series with an extra column 'phase_norm'.
+    ts_fold_bin : `~astropy.timeseries.TimeSeries`
+        The folded binned time series with an extra column 'phase_norm'.
+
     """
-    if isinstance(best_period, float):
-        best_period = best_period * u.d
+    if isinstance(period, float):
+        period = period * u.d
+
     if isinstance(epoch0, float):
-        epoch0 = Time(epoch0, format=ts.time.format)
+        epoch0 = Time(epoch0, format=timeseries.time.format)
 
     if isinstance(duration, float):
         duration = duration * u.d
 
-    ts_fold = ts.fold(period=best_period,
-                      epoch_time=epoch0)
+    ts_fold = timeseries.fold(period=period,
+                              epoch_time=epoch0)
     # ts_fold_bin = aggregate_downsample(
-    #     ts_fold, time_bin_size=duration * best_period * u.day / nbin)
+    #     ts_fold, time_bin_size=duration * period * u.day / nbin)
     # ts_fold_bin['time_bin_mid'] = ts_fold_bin['time_bin_start'] + \
     #     ts_fold_bin['time_bin_size']
+    # ts_fold_bin = aggregate_downsample(ts_fold, time_bin_size=duration.to(
+    #     period.unit) * period / nbin)
     ts_fold_bin = ts_binner(ts_fold, duration.to(
-        best_period.unit) * best_period / nbin)
+        period.unit) * period / nbin)
     # Normalize the phase
 
-    ts_fold['phase_norm'] = ts_fold.time / (best_period)
+    ts_fold['phase_norm'] = ts_fold.time / (period)
     # ts_fold['phase_norm'][
     #     ts_fold['phase_norm'].value <
     #     -0.3] += 1 * ts_fold['phase_norm'].unit  # For the occultation
-    ts_fold_bin['phase_norm'] = ts_fold_bin['time_bin_mid'] / \
-        (best_period)
+    ts_fold_bin['phase_norm'] = ts_fold_bin['time_bin_center'] / \
+        (period)
     # ts_fold_bin['phase_norm'][
     #     ts_fold_bin['phase_norm'].value <
     #     -0.3] += 1 * ts_fold_bin['phase_norm'].unit  # For the occultation
@@ -264,39 +335,42 @@ def GP_fit(time, flux, flux_err=None, mode='rotation',
            tune=2500, draws=2500, chains=2, target_accept=0.95,
            per=None, ncores=None):
     """Uses Gaussian Processes to model stellar activity.
-        Parameters
-        ----------
-        time : array
-            array of times at which data were taken
-        flux : array
-            array of flux at corresponding time
-        flux_err : array (optional)
-            array of measurment errors of the flux data.
-            Defaults to np.std(flux)
-        mode : 'rotation', others to be implemented
-            Type of stellar variablity to correct.
-            Defaults to 'rotation'
-        period_min :
-            ###########################################################################
-        period_max :
-            ###########################################################################            
-        tune : int
-            number of tune iterations
-        draws : int
-            number of draws iterations
-        chains : int
-            number of chains to sample
-        target_accept : float
-            number should be between 0 and 1
-        per : float (optional)
-            Estimation of the variability period.
-        ncores : int (optional)
-            Number of cores to use for processing. (Default: all)
-        Returns
-        -------
-        flat_samps :
 
-        """
+    Parameters
+    ----------
+    time : array
+        array of times at which data were taken
+    flux : array
+        array of flux at corresponding time
+    flux_err : array, optional
+        array of measurment errors of the flux data.
+        Defaults to np.std(flux)
+    mode : 'rotation', others to be implemented, optional
+        Type of stellar variablity to correct.
+    period_min : float, optional
+        Minimum value for the rotation period of the star. (In days)
+    period_max : float, optional
+        Maximum value for the rotation period of the star. (In days)
+    tune : int, optional
+        number of tune iterations
+    draws : int, optional
+        number of draws iterations
+    chains : int, optional
+        number of chains to sample
+    target_accept : float, optional
+        number should be between 0 and 1
+    per : float, optional
+        Estimation of the variability period.
+    ncores : int, optional
+        Number of cores to use for processing. (Default: all)
+
+    Returns
+    -------
+    trace:
+
+    flat_samps :
+
+    """
 
     if ncores is None:
         ncores = multiprocessing.cpu_count()

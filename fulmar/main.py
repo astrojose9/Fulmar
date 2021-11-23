@@ -30,12 +30,14 @@ import fulmar.fulmar_constants as fulmar_constants
 from fulmar.func import (
     read_lc_from_file,
     normalize_lc,
+    time_flux_err,
     ts_binner,
     fbn,
     GP_fit
 )
 from fulmar.utils import (
     FulmarWarning,
+    print_version,
     rjd_to_astropy_time
 )
 
@@ -66,7 +68,57 @@ from fulmar.mission_dic_manager import read_json_dic
 
 
 class target:
-    "A LightCurve class with its associated parameters"
+    """
+    A target object encompassing lightcurves and relevant parameters for their
+    analysis.
+
+
+    Parameters
+    ----------
+    targname : str or int
+        Name of the target as a string, e.g. "TOI-175" or, if mission
+    mission : str, optional
+        'Kepler', 'K2', or 'TESS'
+
+    Attributes
+    ----------
+    ab : tuple of floats
+        Quadratic limb darkening parameters a, b.
+    M_star : float
+        Stellar mass (in units of solar masses)
+    M_star_min : float
+        1-sigma upper confidence interval on stellar mass
+        (in units of solar mass)
+    M_star_max : float
+        1-sigma lower confidence interval on stellar mass
+        (in units of solar mass)
+    R_star : float
+        Stellar radius (in units of solar radii).
+    R_star_min : float
+        1-sigma lower confidence interval on stellar radius
+        (in units of solar radii)
+    R_star_max : float
+        1-sigma upper confidence interval on stellar radius
+        (in units of solar radii)
+    flux_kw : str
+        Keyword for the column containing the flux values
+        (Default: 'flux')
+    flux_err_kw : str
+        Keyword for the column containing the flux uncertainty values
+        (Default: 'flux_err')
+
+    Notes
+    -----
+
+    Examples
+    --------
+    >>> import fulmar
+    >>> lc_targ = fulmar.target('TOI-175')
+    >>> lc_targ.R_star
+    array(0.31416)
+    >>> lc_targ.mission
+    'TESS'
+    """
 
     def __init__(self, targname, mission=None):
 
@@ -219,16 +271,22 @@ class target:
     # Setters
 
     def set_lc_folder(self, inptfolder):
-        """Set the folder in which the lightcurves are downloaded"""
+        """Sets the folder in which the lightcurves are downloaded"""
         self.lc_folder = inptfolder
 
     def set_flux_kw(self, flux_kw):
+        """
+        Sets the keyword for the column containing the flux values.
+        """
         if isinstance(flux_kw, str):
             self.flux_kw = flux_kw
         else:
             warnings.warn('flux_kw parameter should be string', TypeError)
 
     def set_flux_err_kw(self, flux_err_kw):
+        """
+        Sets the keyword for the column containing the flux uncertainty values.
+        """
         if isinstance(flux_err_kw, str):
             self.flux_err_kw = flux_err_kw
         else:
@@ -237,7 +295,29 @@ class target:
     # Retrieving data
 
     def search_data(self, author=None, exptime=None, download=False):
-        """Search for available lightcurves ofr the target"""
+        """Search for available lightcurves of the target
+
+        Parameters
+        ----------
+        author : str, tuple of str, or "any"
+            Author of the data product (`provenance_name` in the MAST API).
+            Official Kepler, K2, and TESS pipeline products have author names
+            'Kepler', 'K2', and 'SPOC'.
+        exptime : 'long', 'short', 'fast', or float
+            'long' selects 10-min and 30-min cadence products;
+            'short' selects 1-min and 2-min products;
+            'fast' selects 20-sec products.
+            Alternatively, you can pass the exact exposure time in seconds as
+            an int or a float, e.g., ``exptime=600`` selects 10-minute cadence.
+            By default, all cadence modes are returned.
+        download : bool
+            Whether the data should be downloaded or not.
+
+        Returns
+        -------
+        srch : `SearchResult` object
+            Object detailing the data products found.
+        """
         self.exptime = exptime
 
         # Author for lightcurves ‘Kepler’, ‘K2’, and ‘SPOC’ are the officials
@@ -278,25 +358,23 @@ class target:
 
     def build_lightcurve(self, filelist=None, author=None, exptime=None,
                          colnames=None):
-        """Build the lightcurve by reading selected data and stitching
-        Creates a LightCurve from a file.
+        """Build the timeseries by reading and stitching selected data.
+
         Parameters
         ----------
-        filelist : list or str (optional)
+        filelist : list or str, optional
             List of paths/path to the file containing the light curve data.
-        author : str (optional)
+        author : str, optional
             Name of the pipeline used to reduce the data.
-        exptime : float (optional)
+        exptime : float, optional
             Exposure time of the observation, in seconds.
-        colnames : list (of str) (optional)
+        colnames : list (of str), optional
             Names of the columns. Should have the same number of
             items as the number of columns.
-        Examples
-        --------
 
         Returns
         -------
-        ts_stitch : 'TimeSeries'
+        ts_stitch : `~astropy.timeseries.TimeSeries`
             TimeSeries object combining data from selected lightcurves.
         """
         lc_col = lk.LightCurveCollection([])
@@ -345,23 +423,26 @@ class target:
                       sigma_lower=None, sigma_upper=None):
         """Creates a mask to remove outliers from the lightcurve
         with special care to avoid removing transits.
+
         Parameters
         ----------
-        timeseries : astropy.TimeSeries or astropy.Table (optional)
+        timeseries : `~astropy.timeseries.TimeSeries` or `~astropy.table.Table`, optional
             TimeSeries ot Table object containing the data to filter
-        Examples
-        --------
+        sigma : float, optional
+            The number of standard deviations to use for the clipping limit
+        sigma_lower : float, optional
+            The number of standard deviations to use as the lower bound
+            for the clipping limit.
+        sigma_upper : float, optional
+            The number of standard deviations to use as the upper bound
+            for the clipping limit.
 
         Returns
         -------
         clean : np.array
-            mask where outliers are marked as "false" """
+            mask where outliers are marked as "False"
+        """
 
-        # # Select which flux to work on. Expected values are norm or corr
-        # if flux_mode == 'norm':
-        #     flux = self.ts_stitch[self.flux_kw + '_norm']
-        # elif flux_mode == 'corr':
-        #     flux = self.ts_stitch[self.ts_stitch[self.flux_kw + '_corr']]
         if timeseries is None:
             flux = self.ts_stitch[self.flux_kw]
 
@@ -410,6 +491,7 @@ class target:
             timeseries=None,
             sigma=3,
             wl=1501,
+            time_window=None,
             polyorder=2,
             return_trend=False,
             remove_outliers=True,
@@ -420,46 +502,51 @@ class target:
         This method wraps `scipy.signal.savgol_filter`.
         Parameters
         ----------
-        sigma : int
-            Number of sigma above which to remove outliers from the flatten
-        timeseries : 'TimeSeries' (optional)
+        sigma : float, optional
+            Number of standard deviations to use for the clipping limit.
+        timeseries : `~astropy.timeseries.TimeSeries`, optional
             TimeSeries ot Table object containing the data to filter
         wl : int
             Window_length
             The length of the filter window (i.e. the number of coefficients).
             ``window_length`` must be a positive odd integer.
-        polyorder : int
+        time_window : '~astropy.units.Quantity' or float, optional
+            Time length of the filter window. Window_lenght will be set to the
+            closest odd integer taking exposition time into account.
+            Overrules wl.
+        polyorder : int, optional
             The order of the polynomial used to fit the samples. ``polyorder``
             must be less than window_length.
-        return_trend : bool
+        return_trend : bool, optional
             If `True`, the method will return a tuple of two elements
             (ts_clean, trend_ts) where trend_ts is the removed trend.
         remove_outliers : bool
             If 'True', the method uses mask_outliers to created a mask of valid
             datapoints to be applied to the products before returning them.
-        break_tolerance : int
+        break_tolerance : int, optional
             If there are large gaps in time, flatten will split the flux into
             several sub-lightcurves and apply `savgol_filter` to each
             individually. A gap is defined as a period in time larger than
             `break_tolerance` times the median gap.  To disable this feature,
             set `break_tolerance` to None.
-        niters : int
+        niters : int, optional
             Number of iterations to iteratively sigma clip and flatten. If more
             than one, will perform the flatten several times,
             removing outliers each time.
 
-        mask : boolean array with length of self.time
+        mask : boolean array with length of time, optional
             Boolean array to mask data with before flattening. Flux values
             where mask is True will not be used to flatten the data. An
             interpolated result will be provided for these points. Use this
             mask to remove data you want to preserve, e.g. transits.
+
         Returns
         -------
-        ts_clean : 'TimeSeries'
-            New TimeSeries object with long-term trends removed.
+        ts_clean : `~astropy.timeseries.TimeSeries`
+            New `TimeSeries` object with long-term trends removed.
         If ``return_trend`` is set to ``True``, this method will also return:
-        trend_ts : 'TimeSeries'
-            New TimeSeries object containing the trend that was removed from
+        trend_ts : `~astropy.timeseries.TimeSeries`
+            New `TimeSeries` object containing the trend that was removed from
             the flux.
         """
         if timeseries is None:
@@ -471,9 +558,22 @@ class target:
         flux = self.ts_stitch[self.flux_kw]
         lc = lk.LightCurve(self.ts_stitch)
 
+        if mask is None:
+            mask = np.full_like(self.ts_clean.time.value, False, dtype=bool)
+
         # Inital robust stats
         robustmean1, robustmedian1, robustrms1 = sigma_clipped_stats(
             flux, sigma=sigma, maxiters=10, mask=mask)
+
+        if time_window is not None:
+            if isinstance(time_window, float):
+                time_window = time_window * u.d
+            # observation time interval
+            dt = (self.ts_clean.time[1] - self.ts_clean.time[0]).to(
+                time_window.unit)
+            nobs = round((time_window / dt).value)
+            # make sure the number is odd
+            wl = nobs + 1 - (nobs % 2)
 
         # prefiltering
         # lc = lk.LightCurve(time=self.ts_stitch.time.value,
@@ -482,7 +582,7 @@ class target:
 
         clc = lc.flatten(window_length=wl,
                          polyorder=polyorder,
-                         break_tolerance=5,
+                         break_tolerance=break_tolerance,
                          sigma=sigma,
                          mask=mask)
 
@@ -492,7 +592,7 @@ class target:
         clip = sigma_clip(flux_filtered1, sigma)
 
         finflat = lc.flatten(window_length=wl, polyorder=polyorder,
-                             break_tolerance=5, sigma=sigma,
+                             break_tolerance=break_tolerance, sigma=sigma,
                              return_trend=True, mask=clip.mask)
 
         clc1 = finflat[0]
@@ -541,42 +641,50 @@ class target:
             return_trend=False,
             remove_outliers=True,
             sigma_out=3,
-            mask=None):
+            mask=None,
+            store_trace=False):
         """Corrects the stellar rotation using GP
+
         Parameters
         ----------
-        timeseries : 'TimeSeries' (optional)
+        timeseries : `~astropy.timeseries.TimeSeries`, optional
             TimeSeries ot Table object containing the data to filter
         bin_duration : 'astropy.units.Quantity' or float
             Time interval for the binned time series.
             (Default is in units of days)
-        period_min :
-            ###########################################################################
-        period_max :
-            ###########################################################################
-        ncores : int (optional)
+        period_min : float, optional
+            Minimum value for the rotation period of the star. (In days)
+        period_max : float, optional
+            Maximum value for the rotation period of the star. (In days)
+        ncores : int, optional
             Number of cores to use for processing. (Default: all)
-        return_trend : bool
+        return_trend : bool, optional
             If `True`, the method will return a tuple of two elements
             (ts_clean, trend_ts) where trend_ts is the removed trend.
         remove_outliers : bool
             If 'True', the method uses mask_outliers to created a mask of valid
             datapoints to be applied to the products before returning them.
-        sigma_out : int
+        sigma_out : int, optional
             Number of sigma above which to remove outliers from the flatten
         mask : boolean array with length of self.time
             Boolean array to mask data with before flattening. Flux values
             where mask is True will not be used to flatten the data. An
             interpolated result will be provided for these points. Use this
             mask to remove data you want to preserve, e.g. transits.
+        store_trace : bool, optional
+            If True, the posterior sampling of the GP model will be stored as
+            an attribute called "activity_gp_trace" (target.activity_gp_trace).
+            It can be useful to run convergence checks.
+
         Returns
         -------
-        ts_clean : 'TimeSeries'
+        ts_clean : `~astropy.timeseries.TimeSeries`
             New TimeSeries object with long-term trends removed.
         If ``return_trend`` is set to ``True``, this method will also return:
-        trend_ts : 'TimeSeries'
+        trend_ts : `~astropy.timeseries.TimeSeries`
             New TimeSeries object containing the trend that was removed from
-            the flux."""
+            the flux.
+        """
         if ncores is None:
             ncores = multiprocessing.cpu_count()
 
@@ -598,7 +706,7 @@ class target:
         else:
             self.ts_binned = ts_binner(self.ts_clean, bin_duration)
 
-        t_bin = self.ts_binned['time_bin_mid'].value
+        t_bin = self.ts_binned.time.value
         y_bin = self.ts_binned[self.flux_kw].value
         y_err_bin = self.ts_binned[self.flux_err_kw].value
         # print(y_err_bin)
@@ -630,6 +738,9 @@ class target:
         # GP_fit
         trace, flat_samps = GP_fit(
             t_bin, y_bin, y_err_bin, per=peak['period'], ncores=ncores)
+
+        if store_trace is True:
+            self.activity_gp_trace = trace
         gp_mod = np.median(flat_samps["pred"].values, axis=1)
 
         # interpolate the model to the data, as it is currently binned
@@ -654,75 +765,45 @@ class target:
 
         return self.ts_clean
 
-    def time_flux_err(
-            self,
-            timeseries=None,
-            cleaned=True,
-            replace_nan_err=True):
-        """ Returns 3 arrays with time, flux and flux_err
+    def plot_transitcheck(self, period, epoch0, duration=3 * u.h, nbin=40,
+                          timeseries=None, savefig=False, fig_id=None):
+        """
+        Plots a transitcheck image. A visual check at a given period and epoch
+        useful to probe signals detected in RV.
+
         Parameters
-            ----------
-            timeseries : 'TimeSeries'
-                TimeSeries object
-            cleaned : bool (optional)
-                Whether the periodogram should be conducted on the cleaned
-                or the stitched timeseries (default: True)
-            replace_nan_err : bool
-                To deal with the case where the flux_err column is full
-                of NaNs. When True, creates an array filled with the standard
-                deviation of the flux.
-                When false, returns an array full of NaNs.
-            Returns
-            -------
-            t : array
-                Array of time where values of type NaN, None, inf, and negative
-                have been removed, as well as masks.
-            flux : array
-                Array of flux where values of type NaN, None, inf, and negative
-                have been removed, as well as masks.
-            flux_err : array
-                Array of flux_err where values of type NaN, None, inf,
-                and negative have been removed, as well as masks.
-                If the original was filled with NaNs: if replace_nan_err=True,
-                returns an array filled with the standard deviation of flux.
-                if replace_nan_err=False, returns an array filled with Nans.
+        ----------
+        period : '~astropy.time.Time' or float
+            The period to use for folding.
+        epoch0 : '~astropy.units.Quantity' or float
+            The time to use as the reference epoch.
+        duration : '~astropy.units.Quantity' or float
+            Duration of the transit.
+        nbin : int
+            Number of bins in the transit window.
+        timeseries : `~astropy.timeseries.TimeSeries`, optional
+            TimeSeries object
+        savefig : bool
+            If True, saves the resulting figure on the disk.
+        fig_id : str or int
+            Suffix for the filename when the figure is exported.
+
         """
-        t = timeseries.time.value
-        flux = np.array(timeseries[self.flux_kw], dtype=np.float64)
-        flux_err = np.array(timeseries[self.flux_err_kw], dtype=np.float64)
-
-        # The case where flux_err is filled with Nan
-        if len(cleaned_array(t, flux, flux_err)[0]) == 0:
-            t, flux = cleaned_array(t, flux)
-
-            if replace_nan_err is True:
-                flux_err = np.full_like(flux, np.std(flux))
-            else:
-                flux_err = np.nan * flux
-        # Case 2: y_err contains (at least some) valid data
+        if timeseries is not None:
+            ts_fold, ts_fold_bin = fbn(
+                timeseries, period, epoch0, duration)
         else:
-            t, flux, flux_err = cleaned_array(t, flux, flux_err)
+            ts_fold, ts_fold_bin = fbn(
+                self.ts_stitch, period, epoch0, duration)
 
-        return t, flux, flux_err
-
-    def plot_transitcheck(self, best_period, epoch0, duration,
-                          savefig=False, periodn=None):
-        """
-        Plots a transitcheck
-        ts_fold : folded timeseries
-        ts_fold_bin : binned folded timeseries
-        """
-        ts_fold, ts_fold_bin = fbn(
-            self.ts_stitch, best_period, epoch0, duration)
-
-        ts_fold['phase_norm'] = ts_fold.time / (best_period * u.d)
+        # Wrap the phase for the occultation
         ts_fold['phase_norm'][
             ts_fold['phase_norm'].value <
-            -0.3] += 1 * ts_fold['phase_norm'].unit  # For the occultation
-        ts_fold_bin['phase_norm'] = ts_fold_bin['time_bin_mid'] / \
-            (best_period * u.d)
+            -0.3] += 1 * ts_fold['phase_norm'].unit
+
         ts_fold_bin['phase_norm'][ts_fold_bin['phase_norm'].value <
                                   -0.3] += 1 * ts_fold_bin['phase_norm'].unit
+
         # For the occultation
 
         # Plots the graphs
@@ -730,7 +811,7 @@ class target:
         gs = GridSpec(2, 3, figure=fig)
 
         ax1 = fig.add_subplot(gs[0:, :-1])
-        ax1.plot(ts_fold['phase_norm'],
+        ax1.plot(ts_fold['phase_norm'].value,
                  ts_fold[self.flux_kw],
                  '.k',
                  alpha=0.25,
@@ -751,13 +832,13 @@ class target:
         ax1.set_ylabel('Flux')
         if self.mission == 'TESS':
             ax1.set_title(
-                self.TOI + ' Phase folded at {0:.4f} d'.format(best_period))
+                self.TOI + ' Phase folded at {0:.4f}'.format(period))
         elif self.mission == 'Kepler':
             ax1.set_title(
-                self.kep + ' Phase folded at {0:.4f} d'.format(best_period))
+                self.kep + ' Phase folded at {0:.4f}'.format(period))
         elif self.mission == 'K2':
             ax1.set_title(
-                self.K2 + ' Phase folded at {0:.4f} d'.format(best_period))
+                self.K2 + ' Phase folded at {0:.4f}'.format(period))
         ax2 = fig.add_subplot(gs[0, 2])
         ax2.plot(ts_fold_bin['phase_norm'].value,
                  ts_fold_bin[self.flux_kw],
@@ -785,9 +866,9 @@ class target:
         ax3.set_ylabel('Flux')
         ax3.set_title('Occultation')
         if savefig is True:
-            if periodn is None:
-                periodn = 1
-            plt.savefig(self.lc_folder + 'transitcheck' + str(periodn),
+            if fig_id is None:
+                fig_id = 1
+            plt.savefig(self.lc_folder + 'transitcheck' + str(fig_id),
                         facecolor='white', dpi=240)
         plt.show()
         plt.close()
@@ -804,9 +885,9 @@ class target:
     #     """Computes the tls periodogram of the selected lightcurve
     #     Parameters
     #     ----------
-    #     timeseries : 'TimeSeries' (optional)
+    #     timeseries : `~astropy.timeseries.TimeSeries`, optional
     #         TimeSeries ot Table object containing the data to filter
-    #     cleaned : bool (optional)
+    #     cleaned : bool, optional
     #         Whether the periodogram should be conducted on the cleaned or the
     #         stitched timeseries (default: True)
     #     period_min : float
@@ -815,7 +896,7 @@ class target:
     #     period_max : float
     #         Maximum trial period (in units of days) (default: Half the duration
     #          of the time series)
-    #     n_transits_min : int (optional)
+    #     n_transits_min : int, optional
     #         Minimum number of transits required. Overrules period_max.
     #         (default=2)
     #     mask : boolean array with length of time
@@ -894,6 +975,7 @@ class target:
     #             transit_depth_min=transit_depth_min)
 
     #     return self.tls_results
+
     def tls_periodogram(
             self,
             timeseries=None,
@@ -903,46 +985,60 @@ class target:
         """Computes the tls periodogram of the selected lightcurve
         Parameters
         ----------
-        timeseries : 'TimeSeries' (optional)
+        timeseries : `~astropy.timeseries.TimeSeries`, optional
             TimeSeries ot Table object containing the data to filter
-        cleaned : bool (optional)
+        cleaned : bool, optional
             Whether the periodogram should be conducted on the cleaned or the
             stitched timeseries (default: True)
-        period_min : float
+        period_min : float, optional
             Minimum trial period (in units of days). If none is given,
             the limit is derived from the Roche limit
-        period_max : float
+        period_max : float, optional
             Maximum trial period (in units of days) (default: Half the duration
              of the time series)
-        n_transits_min : int (optional)
+        n_transits_min : int, optional
             Minimum number of transits required. Overrules period_max.
             (default=2)
         mask : boolean array with length of time
             Boolean array to mask data, typically transits. Data where mask is
             "True" will not be taken into account for the periodogram.
+
         Returns
         -------
-        tls_results : transitleastsquaresresults
+        tls_results : `transitleastsquaresresults`
         """
 
         if timeseries is None:
 
             if cleaned is True:
-                t = self.ts_clean.time.value
-                y = np.array(
-                    self.ts_clean[self.flux_kw], dtype=np.float64)
-                y_err = np.array(
-                    self.ts_clean[self.flux_err_kw], dtype=np.float64)
+                t, y, y_err = time_flux_err(
+                    self.ts_clean,
+                    flux_kw=self.flux_kw,
+                    flux_err_kw=self.flux_err_kw)
+
+                # t = self.ts_clean.time.value
+                # y = np.array(
+                #     self.ts_clean[self.flux_kw], dtype=np.float64)
+                # y_err = np.array(
+                #     self.ts_clean[self.flux_err_kw], dtype=np.float64)
             else:
-                t = self.ts_stitch.time.value
-                y = np.array(
-                    self.ts_stitch[self.flux_kw], dtype=np.float64)
-                y_err = np.array(
-                    self.ts_stitch[self.flux_err_kw], dtype=np.float64)
+                t, y, y_err = time_flux_err(
+                    self.ts_stitch,
+                    flux_kw=self.flux_kw,
+                    flux_err_kw=self.flux_err_kw)
+                # t = self.ts_stitch.time.value
+                # y = np.array(
+                #     self.ts_stitch[self.flux_kw], dtype=np.float64)
+                # y_err = np.array(
+                #     self.ts_stitch[self.flux_err_kw], dtype=np.float64)
         else:
-            t = timeseries.time.value
-            y = np.array(timeseries[self.flux_kw], dtype=np.float64)
-            y_err = np.array(timeseries[self.flux_err_kw], dtype=np.float64)
+            t, y, y_err = time_flux_err(
+                timeseries,
+                flux_kw=self.flux_kw,
+                flux_err_kw=self.flux_err_kw)
+            # t = timeseries.time.value
+            # y = np.array(timeseries[self.flux_kw], dtype=np.float64)
+            # y_err = np.array(timeseries[self.flux_err_kw], dtype=np.float64)
 
         # Accounts for possible mask
         if mask is not None:  # intransit = True
@@ -961,7 +1057,6 @@ class target:
             t, y, y_err = cleaned_array(t, y, y_err)
             model = transitleastsquares(t, y, y_err)
 
-
         # Compute the periodogram
         self.tls_results = model.power(**kwargs)
 
@@ -972,19 +1067,21 @@ class target:
 #     "A transit object with its associated parameters"
 
 
-def params_optimizer(time, flux, flux_err, period_guess, t0_guess, depth_guess, ab, r_star, target_id, tran_window=0.25, ncores=None, mask=None):
+def params_optimizer(timeseries, period_guess, t0_guess, depth_guess, ab, r_star, target_id, tran_window=0.25, ncores=None, mask=None):
     if ncores is None:
         ncores = multiprocessing.cpu_count()
     print('running on {} cores'.format(ncores))
 #     x = ts_stitch.time.value
 #     y = ts_stitch[flux_kw + '_clean'].value
 #     yerr = ts_stitch[flux_err_kw+'_clean'].value
-    if r_star is None: #####################################################################
+    if r_star is None:
         r_star = catalog_info(TIC_ID=target_identifier(target_id)[0])[4]
 
-    x = time.copy()
-    y = flux.copy()
-    yerr = flux_err.copy()
+    x, y, yerr = time_flux_err(timeseries)
+
+    # x = time.copy()
+    # y = flux.copy()
+    # yerr = flux_err.copy()
 
     if mask is not None:
         x = x[mask]
@@ -1042,16 +1139,13 @@ def params_optimizer(time, flux, flux_err, period_guess, t0_guess, depth_guess, 
         orbit = xo.orbits.KeplerianOrbit(
             period=period, duration=dur, ror=ror, t0=t0, b=b)
 
-        # We're going to track the implied density for reasons that will become clear later
+        # We're going to track the implied density
         pm.Deterministic("rho_circ", orbit.rho_star)
 
         # Set up the mean transit model
         light_curves = xo.LimbDarkLightCurve(
             u).get_light_curve(orbit=orbit, r=ror, t=x)
 
-    #     def lc_model(t):
-    #         return mean + tt.sum(lc, axis=-1
-    #         )
         light_curve = pm.math.sum(light_curves, axis=-1) + mean
 
         # Here we track the value of the model light curve for plotting
@@ -1072,14 +1166,12 @@ def params_optimizer(time, flux, flux_err, period_guess, t0_guess, depth_guess, 
 
         # Optimize the model
         map_soln = model.test_point
-        # map_soln = pmx.optimize(map_soln, vars=[sigma, log_sigma_gp, log_rho_gp]
-        #                        )
-        #map_soln = pmx.optimize(map_soln, [sigma])
+
         map_soln = pmx.optimize(map_soln, [ror, b, dur])
-        #map_soln = pmx.optimize(map_soln, noise_params)
+
         map_soln = pmx.optimize(map_soln, star_params)
         map_soln = pmx.optimize(map_soln)
-        #map_soln = pmx.optimize()
+        map_soln = pmx.optimize()
 
 
 #         plt.figure(figsize=(9, 5))

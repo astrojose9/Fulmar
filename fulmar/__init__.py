@@ -5,7 +5,7 @@ from __future__ import division
 
 from .main import *
 from .time import *
-from utils import *
+from .utils import *
 
 import warnings
 

@@ -13,6 +13,14 @@ FULMAR can be installed using: `pip install fulmar-astro`
 
 If you have multiple versions of Python and pip on your machine, try: `pip3 install fulmar-astro`
 
+pip might output the following error message:
+```
+ERROR: Could not find a version that satisfies the requirement argparse (from transitleastsquares) (from versions: none)
+ERROR: No matching distribution found for argparse
+```
+It comes from the new behaviour of pip. More info [here](https://github.com/pypa/pip/issues/9035#issuecomment-714595232). ~~A pull request with a patch fixing the issue was made on [TransitLeastSquares](https://github.com/hippke/tls)' repo.~~ The issue was fixed in transitleastsquares 1.0.31.
+
+
 The latest version can be pulled from github::
 ```
 git clone https://github.com/astrojose9/fulmar.git
@@ -24,10 +32,11 @@ If the command `python` does not point to Python 3 on your machine, you can try 
 
 
 
-***Dependencies***:
+**Dependencies**:
 Python 3,
 [Arviz](https://arviz-devs.github.io/arviz/),
 [Astropy](https://www.astropy.org/),
+[celerite2](https://celerite2.readthedocs.io/en/latest/)
 [corner](https://github.com/dfm/corner.py),
 [exoplanet](https://docs.exoplanet.codes/en/latest/),
 [Lightkurve](https://docs.lightkurve.org/),
@@ -55,4 +64,4 @@ FULMAR is distributed under MIT License.
 
 
 
-Copyright 2020, José Rodrigues.
+Copyright 2021, José Rodrigues.

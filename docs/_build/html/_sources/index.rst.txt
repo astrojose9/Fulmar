@@ -22,7 +22,7 @@ Check out the :doc:`installation` section to start using FULMAR.
    installation
    api
 
-Todo
+.. todo::
 Thank Elisa for the logo   
 
 Indices and tables
