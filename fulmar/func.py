@@ -11,6 +11,8 @@ from astropy.timeseries import (
 from astropy.stats import sigma_clipped_stats
 import exoplanet as xo
 import lightkurve as lk
+import matplotlib.pyplot as plt
+from matplotlib.gridspec import GridSpec
 import multiprocessing
 import numpy as np
 from transitleastsquares import cleaned_array
@@ -518,3 +520,201 @@ def GP_fit(time, flux, flux_err=None, mode='rotation',
 
     flat_samps = trace.posterior.stack(sample=("chain", "draw"))
     return trace, flat_samps
+
+def params_optimizer(timeseries, period_guess, t0_guess, depth_guess, ab, r_star, target_id, tran_window=0.25, ncores=None, mask=None):
+    if ncores is None:
+        ncores = multiprocessing.cpu_count()
+    print('running on {} cores'.format(ncores))
+#     x = ts_stitch.time.value
+#     y = ts_stitch[flux_kw + '_clean'].value
+#     yerr = ts_stitch[flux_err_kw+'_clean'].value
+
+    if mask is not None:
+        x, y, yerr = time_flux_err(timeseries[mask])
+
+    x, y, yerr = time_flux_err(timeseries)
+
+    # x = time.copy()
+    # y = flux.copy()
+    # yerr = flux_err.copy()
+
+    transitMask = (np.abs(
+        (x - t0_guess + 0.5 * period_guess) % period_guess - 0.5 * period_guess) < tran_window)
+    x = np.ascontiguousarray(x[transitMask])
+    y = np.ascontiguousarray(y[transitMask]) - 1
+    yerr = np.ascontiguousarray(yerr[transitMask])
+
+
+#     plt.figure(figsize=(8, 4))
+#     x_fold = (
+#         x - t0_guess + 0.5 * period_guess
+#     ) % period_guess - 0.5 * period_guess
+#     plt.scatter(x_fold, y, c=x, s=3)
+#     plt.xlabel("time since transit [days]")
+#     plt.ylabel("relative flux [ppt]")
+#     plt.colorbar(label="time [days]")
+#     _ = plt.xlim(-tran_window, tran_window)
+
+    import pymc3 as pm
+    import aesara_theano_fallback.tensor as tt
+
+    import pymc3_ext as pmx
+#     from celerite2.theano import terms, GaussianProcess
+
+    with pm.Model() as model:
+
+        # Stellar parameters
+        mean = pm.Normal("mean", mu=0.0, sigma=10.0)
+#         u = xo.distributions.QuadLimbDark("u", testval=np.array(ab))
+#         star_params = [mean, u]
+        u = ab
+        star_params = [mean]
+
+        # Planet parameters
+        log_ror = pm.Normal(
+            "log_ror", mu=0.5 * np.log(depth_guess), sigma=10.0
+        )
+        ror = pm.Deterministic("ror", tt.exp(log_ror))
+        r_pl = pm.Deterministic("r_pl", ror * r_star)
+        # Orbital parameters
+        log_period = pm.Normal(
+            "log_period", mu=np.log(period_guess), sigma=1.0)
+        period = pm.Deterministic("period", tt.exp(log_period))
+        t0 = pm.Normal("t0", mu=t0_guess, sigma=1.0)
+        log_dur = pm.Normal("log_dur", mu=np.log(0.06), sigma=10.0)
+        dur = pm.Deterministic("dur", tt.exp(log_dur))
+        b = xo.distributions.ImpactParameter("b", ror=ror)
+
+        # Set up the orbit
+        orbit = xo.orbits.KeplerianOrbit(
+            period=period, duration=dur, ror=ror, t0=t0, b=b)
+
+        # We're going to track the implied density
+        pm.Deterministic("rho_circ", orbit.rho_star)
+
+        # Set up the mean transit model
+        light_curves = xo.LimbDarkLightCurve(
+            u).get_light_curve(orbit=orbit, r=ror, t=x)
+
+        light_curve = pm.math.sum(light_curves, axis=-1) + mean
+
+        # Here we track the value of the model light curve for plotting
+        # purposes
+        pm.Deterministic("light_curves", light_curves)
+
+        # Finally the GP observation model
+    #     gp = GaussianProcess(
+    #         kernel, t=x, diag=yerr ** 2 + sigma ** 2, mean=lc_model
+    #     )
+    #     gp.marginal("obs", observed=y)
+    #     pm.Deterministic("gp_pred", gp.predict(y))
+
+        pm.Normal("obs", mu=light_curve, sd=np.median(yerr), observed=y)
+
+        # Double check that everything looks good - we shouldn't see any NaNs!
+        print(model.check_test_point())
+
+        # Optimize the model
+        map_soln = model.test_point
+
+        map_soln = pmx.optimize(map_soln, [ror, b, dur])
+
+        map_soln = pmx.optimize(map_soln, star_params)
+        map_soln = pmx.optimize(map_soln)
+        map_soln = pmx.optimize()
+
+
+#         plt.figure(figsize=(9, 5))
+#         x_fold = (x - map_soln["t0"] + 0.5 * map_soln["period"]) % map_soln[
+#             "period"
+#         ] - 0.5 * map_soln["period"]
+#         inds = np.argsort(x_fold)
+#         plt.scatter(x_fold, 1 + y - map_soln["mean"], c=x, s=3)
+#         plt.plot(x_fold[inds], 1 + map_soln["light_curves"][inds] - map_soln["mean"], "k")
+#         plt.xlabel("time since transit [days]")
+#         plt.ylabel("relative flux [ppt]")
+#         plt.colorbar(label="time [days]")
+#         _ = plt.xlim(-tran_window, tran_window)
+#         plt.show()
+
+        np.random.seed()
+        with model:
+            trace = pmx.sample(
+                tune=2500,
+                draws=2000,
+                start=map_soln,
+                chains=2,
+                cores=ncores,
+                target_accept=0.96,
+                return_inferencedata=True,
+            )
+
+        import arviz as az
+        az.summary(trace,
+                   var_names=[
+                       "period",
+                       "t0",
+                       "ror",
+                       'dur',
+                       'b',
+                       #                     "u",
+                       "mean"
+                   ],)
+
+        flat_samps = trace.posterior.stack(sample=("chain", "draw"))
+        p = np.median(flat_samps["period"])
+        t0 = np.median(flat_samps["t0"])
+        dur = np.median(flat_samps["dur"])
+        depth = np.median(flat_samps['ror'])**2
+#         ab = tuple((np.median(flat_samps['u'], axis=-1)))
+
+        # Plot the folded data
+        x_fold = (x - t0 + 0.5 * p) % p - 0.5 * p
+        plt.plot(x_fold, 1 + y, ".k", alpha=0.4, label="data", zorder=-1000)
+
+        # Overplot the phase binned light curve
+        bins = np.linspace(-0.41, 0.41, 50)
+        denom, _ = np.histogram(x_fold, bins)
+        num, _ = np.histogram(x_fold, bins, weights=y)
+        denom[num == 0] = 1.0
+        plt.plot(
+            0.5 * (bins[1:] + bins[:-1]), 1 + num / denom, "o", color="C1", label="binned", alpha=0.7
+        )
+
+        # Plot the folded model
+        inds = np.argsort(x_fold)
+        inds = inds[np.abs(x_fold)[inds] < 0.3]
+        pred = np.percentile(
+            flat_samps["light_curves"][inds, 0], [16, 50, 84], axis=-1
+        )
+        plt.plot(x_fold[inds], 1 + pred[1], color="xkcd:green", label="model")
+        art = plt.fill_between(
+            x_fold[inds], 1 + pred[0], 1 + pred[2], color="xkcd:green", alpha=0.2, zorder=1000
+        )
+        art.set_edgecolor("none")
+
+        # Annotate the plot with the planet's period
+        txt = "period = {0:.5f} +/- {1:.5f} d".format(
+            np.mean(flat_samps["period"].values), np.std(
+                flat_samps["period"].values)
+        )
+        plt.annotate(
+            txt,
+            (0, 0),
+            xycoords="axes fraction",
+            xytext=(5, 5),
+            textcoords="offset points",
+            ha="left",
+            va="bottom",
+            fontsize=12,
+        )
+
+        plt.legend(fontsize=10, loc=4)
+        plt.title(target_id)
+        plt.xlim(-0.5 * p, 0.5 * p)
+        plt.xlabel("time since transit [days]")
+        plt.ylabel("de-trended flux")
+        _ = plt.xlim(-tran_window, tran_window)
+        plt.show()
+
+        return p, t0, dur, depth, ab, flat_samps
