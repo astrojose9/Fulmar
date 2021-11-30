@@ -8,7 +8,7 @@ import numpy as np
 def rjd_to_astropy_time(rjd) -> Time:
     """Converts Reduced Julian Day (RJD) time values to an
     `~astropy.time.Time` object.
-    R Julian Day (BKJD) is a Julian day minus 2400000.0
+    Reduced Julian Day (RJD) is a Julian day minus 2400000.0
     (UTC=January 1, 2000 12:00:00)..
     The time is in the Barycentric Dynamical Time frame (TDB), which is a
     time system that is not affected by leap seconds.
@@ -28,6 +28,12 @@ def rjd_to_astropy_time(rjd) -> Time:
     # we need to set these to zero or `Time` cannot be instantiated.
     rjd[~np.isfinite(rjd)] = 0
     return Time(rjd, format="rjd", scale="tdb")
+
+
+class FulmarError(Exception):
+    """To raise exceptions related to FULMAR
+    """
+    pass
 
 
 class FulmarWarning(Warning):

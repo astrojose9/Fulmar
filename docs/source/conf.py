@@ -38,6 +38,10 @@ templates_path = ['_templates']
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 
 
+# Use Numpy-style docstrings and not Google-style docstrings
+napoleon_google_docstring = False
+napoleon_numpy_docstring = True
+
 # -- Options for HTML output -------------------------------------------------
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for

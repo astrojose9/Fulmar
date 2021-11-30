@@ -28,6 +28,8 @@ import warnings
 # FULMAR parts
 import fulmar.fulmar_constants as fulmar_constants
 from fulmar.func import (
+    mission_identifier,
+    target_identifier,
     read_lc_from_file,
     normalize_lc,
     time_flux_err,
@@ -38,33 +40,11 @@ from fulmar.func import (
 from fulmar.utils import (
     FulmarWarning,
     print_version,
-    rjd_to_astropy_time
+    rjd_to_astropy_time,
+    TargError
 )
 
-from fulmar.mission_dic_manager import read_json_dic
-
-# # FONCTIONS A CLASSIFIER ######################################################################################
-
-# utils?
-
-
-# class FulmarWarning(Warning):
-#     """ Class form warning to be displayed as
-#     "FulmarWarning"
-#     """
-
-#     pass
-
-
-# def warning_on_one_line(message, category, filename, lineno,
-#                         file=None, line=None):
-#     return ' %s:%s: %s: %s' % (filename, lineno, category.__name__, message)
-
-
-# warnings.formatwarning = warning_on_one_line
-
-
-# # FONCTIONS A CLASSIFIER ######################################################################################
+##############################################################################
 
 
 class target:
@@ -76,7 +56,8 @@ class target:
     Parameters
     ----------
     targname : str or int
-        Name of the target as a string, e.g. "TOI-175" or, if mission
+        Name of the target as a string, e.g. "TOI-175" or, if mission is passed
+        as the numerical identifier of the input catalog.
     mission : str, optional
         'Kepler', 'K2', or 'TESS'
 
@@ -106,6 +87,37 @@ class target:
     flux_err_kw : str
         Keyword for the column containing the flux uncertainty values
         (Default: 'flux_err')
+    KIC : str
+        For Kepler targets. Identifier in the format of the Kepler input
+        catalog, e.g. "KIC11904151"
+    kep : str
+        For Kepler targets. Identifier in the format of the Kepler mission
+        catalog, e.g. "Kepler-10"
+    KIC_num : int
+        For Kepler targets. Number of the input catalog, e.g. "11904151"
+    EPIC : str
+        For K2 targets. Identifier in the format of the Ecliptic Plane input
+        catalog, e.g. "EPIC201437844"
+    K2 : str
+        For K2 targets. Identifier in the format of the K2 mission
+        catalog, e.g. "K2-109"
+    EPIC_num : int
+        For K2 targets. Number of the input catalog, e.g. "201437844"
+    TIC : str
+        For TESS targets. Identifier in the format of the TESS input catalog,
+        e.g. "TIC307210830"
+    TOI : str
+        For TESS targets. Identifier in the format of the TESS mission catalog,
+        e.g. "TOI-175"
+    TIC_num : int
+        For TESS targets. Number of the input catalog,
+        e.g. "307210830"
+    lc_folder : str
+        Path to the folder where data is produced.
+    ts_stitch : `~astropy.timeseries.TimeSeries`
+            TimeSeries object combining data from selected lightcurves.
+    ts_clean : `~astropy.timeseries.TimeSeries`
+            TimeSeries object with trends removed.
 
     Notes
     -----
@@ -132,14 +144,14 @@ class target:
                 warnings.warn('Please add the catalog prefix and/or \
                     the mission parameter to your input.', FulmarWarning)
             else:  # Detect mission from the prefix
-                self.target_identifier(targname, None)
+                self.mission = mission_identifier(targname)
 
         self.mission = fulmar_constants.MISSION_DIC[self.mission.lower()]
 
         # Identifiers and stellar parameters
         if self.mission == 'TESS':
             # TESS identifiers
-            self.TIC, self.TOI, self.TIC_num = self.target_identifier(
+            self.TIC, self.TOI, self.TIC_num = target_identifier(
                 targname, self.mission)
 
             # Stellar parameters from TIC
@@ -147,7 +159,7 @@ class target:
                 TIC_ID=self.TIC_num)
         elif self.mission == 'Kepler':
             # Kepler identifiers
-            self.KIC, self.kep, self.KIC_num = self.target_identifier(
+            self.KIC, self.kep, self.KIC_num = target_identifier(
                 targname, self.mission)
 
             # Stellar parameters from KIC
@@ -155,7 +167,7 @@ class target:
                 KIC_ID=self.KIC_num)
         elif self.mission == 'K2':
             # K2 identifiers
-            self.EPIC, self.K2, self.EPIC_num = self.target_identifier(
+            self.EPIC, self.K2, self.EPIC_num = target_identifier(
                 targname, self.mission)
 
             # Stellar parameters from EPIC
@@ -181,92 +193,6 @@ class target:
         else:
             warnings.warn(self.mission, 'mission is not supported... yet(?)',
                           FulmarWarning)
-
-    def target_identifier(self, target, mission=None):
-        """Translate the target identifiers between different catalogs
-        such as TIC to TOI in the case of TESS or EPIC to K" for K2
-        Updates the mission parameter in case it wasn't passed by the user.
-        """
-        if target[:3].upper() == 'TIC':
-            inputCatalogID = 'TIC' + str(''.join(filter(str.isdigit, target)))
-            tic2toi = read_json_dic(
-                path.join(fulmar_constants.fulmar_dir, 'TIC2TOI.json'))
-            missionCatalogID = tic2toi[inputCatalogID]
-            ICnum = int(inputCatalogID[3:])
-            self.mission = 'TESS'
-
-        elif target[:3].upper() == 'TOI':
-            missionCatalogID = 'TOI-' + \
-                str(''.join(filter(str.isdigit, target)))
-            toi2tic = read_json_dic(
-                path.join(fulmar_constants.fulmar_dir, 'TOI2TIC.json'))
-            inputCatalogID = toi2tic[missionCatalogID]
-            ICnum = int(inputCatalogID[3:])
-            self.mission = 'TESS'
-
-        elif target[:3].upper() == 'KIC':
-            inputCatalogID = 'KIC' + str(''.join(filter(str.isdigit, target)))
-            kic2kepler = read_json_dic(
-                path.join(fulmar_constants.fulmar_dir, 'KIC2Kepler.json'))
-            missionCatalogID = kic2kepler[inputCatalogID]
-            ICnum = int(inputCatalogID[3:])
-            self.mission = 'Kepler'
-
-        elif target[:3].upper() == 'KEP':
-            missionCatalogID = 'Kepler-' + \
-                str(''.join(filter(str.isdigit, target)))
-            kep2kic = read_json_dic(
-                path.join(fulmar_constants.fulmar_dir, 'Kepler2KIC.json'))
-            inputCatalogID = kep2kic[missionCatalogID]
-            ICnum = int(inputCatalogID[3:])
-            self.mission = 'Kepler'
-
-        elif target[:4].upper() == 'EPIC':
-            inputCatalogID = 'EPIC' + str(''.join(filter(str.isdigit, target)))
-            epic2k2 = read_json_dic(
-                path.join(fulmar_constants.fulmar_dir, 'EPIC2K2.json'))
-            missionCatalogID = epic2k2[inputCatalogID]
-            ICnum = int(inputCatalogID[4:])
-            self.mission = 'K2'
-
-        elif target[:2].upper() == 'K2':
-            missionCatalogID = 'K2-' + \
-                str(''.join(filter(str.isdigit, target[2:])))
-            k22epic = read_json_dic(
-                path.join(fulmar_constants.fulmar_dir, 'K22EPIC.json'))
-            inputCatalogID = k22epic[missionCatalogID]
-            ICnum = int(inputCatalogID[4:])
-            self.mission = 'K2'
-
-        elif target.isdigit():
-            if mission == 'TESS':
-                inputCatalogID = 'TIC' + target
-                tic2toi = read_json_dic(
-                    path.join(fulmar_constants.fulmar_dir, 'TIC2TOI.json'))
-                missionCatalogID = tic2toi[inputCatalogID]
-                ICnum = int(inputCatalogID[3:])
-                warnings.warn('No prefix was passed, target is assumed to be \
-                    TIC {}'.format(ICnum), FulmarWarning)
-
-            elif mission == 'Kepler':
-                inputCatalogID = 'KIC' + target
-                kic2kepler = read_json_dic(
-                    path.join(fulmar_constants.fulmar_dir, 'KIC2Kepler.json'))
-                missionCatalogID = kic2kepler[inputCatalogID]
-                ICnum = int(inputCatalogID[3:])
-                warnings.warn('No prefix was passed, target is assumed to be \
-                    KIC {}'.format(ICnum), FulmarWarning)
-
-            elif mission == 'K2':
-                inputCatalogID = 'EPIC' + target
-                epic2k2 = read_json_dic(
-                    path.join(fulmar_constants.fulmar_dir, 'EPIC2K2.json'))
-                missionCatalogID = epic2k2[inputCatalogID]
-                ICnum = int(inputCatalogID[4:])
-                warnings.warn('No prefix was passed, target is assumed to be \
-                    EPIC {}'.format(ICnum), FulmarWarning)
-
-        return inputCatalogID, missionCatalogID, ICnum
 
     # Setters
 
@@ -352,7 +278,7 @@ class target:
 
         sctrs = np.unique(self.srch.mission)
         self.author = np.unique(self.srch.author)
-        self.exptime = np.unique(self.srch.exptime)
+        self.exptime = self.srch.exptime
         print(sctrs)
         return self.srch
 
@@ -384,6 +310,10 @@ class target:
                                     exptime=exptime, download=True)
             lc_col = srch.download_all()
 
+            # Add an exptime column
+            for i, lc in enumerate(lc_col):
+                lc['exptime'] = np.ones(len(lc)) * srch.exptime[i]
+
             if author is None:
                 try:
                     if len(self.author) > 1:
@@ -398,12 +328,13 @@ class target:
 
             if exptime is None:
                 try:
-                    if len(self.exptime) > 1:
+                    if len(np.unique(self.exptime)) > 1:
                         warnings.warn("You are combining data with different "
                                       "exposure times ({}), which is probably "
                                       "not what you want. If such is your "
                                       "goal, please provide an 'exptime' "
-                                      "parameter.".format(self.exptime),
+                                      "parameter.".format(
+                                          np.unique(self.exptime)),
                                       FulmarWarning)
                 except TypeError:
                     pass
@@ -419,7 +350,7 @@ class target:
 
     # Work the data
 
-    def mask_outliers(self, timeseries=None, sigma=3,
+    def mask_outliers(self, timeseries=None, sigma=5,
                       sigma_lower=None, sigma_upper=None):
         """Creates a mask to remove outliers from the lightcurve
         with special care to avoid removing transits.
@@ -873,109 +804,6 @@ class target:
         plt.show()
         plt.close()
 
-    # def tls_periodogram(
-    #         self,
-    #         timeseries=None,
-    #         cleaned=True,
-    #         period_min=None,
-    #         period_max=None,
-    #         n_transits_min=None,
-    #         transit_depth_min=1e-5,
-    #         mask=None):
-    #     """Computes the tls periodogram of the selected lightcurve
-    #     Parameters
-    #     ----------
-    #     timeseries : `~astropy.timeseries.TimeSeries`, optional
-    #         TimeSeries ot Table object containing the data to filter
-    #     cleaned : bool, optional
-    #         Whether the periodogram should be conducted on the cleaned or the
-    #         stitched timeseries (default: True)
-    #     period_min : float
-    #         Minimum trial period (in units of days). If none is given,
-    #         the limit is derived from the Roche limit
-    #     period_max : float
-    #         Maximum trial period (in units of days) (default: Half the duration
-    #          of the time series)
-    #     n_transits_min : int, optional
-    #         Minimum number of transits required. Overrules period_max.
-    #         (default=2)
-    #     mask : boolean array with length of time
-    #         Boolean array to mask data, typically transits. Data where mask is
-    #         "True" will not be taken into account for the periodogram.
-    #     Returns
-    #     -------
-    #     tls_results : transitleastsquaresresults
-    #     """
-
-    #     if timeseries is None:
-
-    #         if cleaned is True:
-    #             t = self.ts_clean.time.value
-    #             y = np.array(
-    #                 self.ts_clean[self.flux_kw], dtype=np.float64)
-    #             y_err = np.array(
-    #                 self.ts_clean[self.flux_err_kw], dtype=np.float64)
-    #         else:
-    #             t = self.ts_stitch.time.value
-    #             y = np.array(
-    #                 self.ts_stitch[self.flux_kw], dtype=np.float64)
-    #             y_err = np.array(
-    #                 self.ts_stitch[self.flux_err_kw], dtype=np.float64)
-    #     else:
-    #         t = timeseries.time.value
-    #         y = np.array(timeseries[self.flux_kw], dtype=np.float64)
-    #         y_err = np.array(timeseries[self.flux_err_kw], dtype=np.float64)
-
-    #     # Accounts for possible mask
-    #     if mask is not None:  # intransit = True
-    #         t = t[~mask]
-    #         y = y[~mask]
-    #         y_err = y_err[~mask]
-
-    #     # Initialize the tls model
-
-    #     # Case 1: y_err only contains NaNs (common with EVEREST)
-    #     if len(cleaned_array(t, y, y_err)[0]) == 0:
-    #         t, y = cleaned_array(t, y)
-    #         model = transitleastsquares(t, y)
-    #     # Case 2: y_err contains (at least some) valid data
-    #     else:
-    #         t, y, yerr = cleaned_array(t, y, y_err)
-    #         model = transitleastsquares(t, y, y_err)
-
-    #     if n_transits_min is None:
-    #         if period_max is not None:
-    #             n_transits_min = int((max(t) - min(t)) / period_max)
-    #         else:
-    #             n_transits_min = 2
-
-    #     if period_max is None:
-    #         period_max = (max(t) - min(t)) / n_transits_min
-
-    #     if period_min is None:
-    #         # Compute the periodogram
-    #         self.tls_results = model.power(
-    #             u=self.ab, R_star=self.R_star,
-    #             R_star_min=self.R_star - self.R_star_min,
-    #             R_star_max=self.R_star + self.R_star_max,
-    #             M_star=self.M_star, M_star_min=self.M_star - self.M_star_min,
-    #             M_star_max=self.M_star + self.M_star_max,
-    #             period_max=period_max, n_transits_min=n_transits_min,
-    #             transit_depth_min=transit_depth_min)
-    #     else:
-    #         # Compute the periodogram
-    #         self.tls_results = model.power(
-    #             u=self.ab, R_star=self.R_star,
-    #             R_star_min=self.R_star - self.R_star_min,
-    #             R_star_max=self.R_star + self.R_star_max,
-    #             M_star=self.M_star, M_star_min=self.M_star - self.M_star_min,
-    #             M_star_max=self.M_star + self.M_star_max,
-    #             period_min=period_min, period_max=period_max,
-    #             n_transits_min=n_transits_min,
-    #             transit_depth_min=transit_depth_min)
-
-    #     return self.tls_results
-
     def tls_periodogram(
             self,
             timeseries=None,
@@ -1065,5 +893,3 @@ class target:
 # # Create a transit/planet object?
 # class transit:
 #     "A transit object with its associated parameters"
-
-

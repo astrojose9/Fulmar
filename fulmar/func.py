@@ -15,14 +15,22 @@ import matplotlib.pyplot as plt
 from matplotlib.gridspec import GridSpec
 import multiprocessing
 import numpy as np
+import os
+from os import path
 from transitleastsquares import cleaned_array
 
 import warnings
 
+import fulmar.fulmar_constants as fulmar_constants
 from fulmar.utils import (
+    FulmarError,
     FulmarWarning,
+    print_version,
     rjd_to_astropy_time
 )
+
+from fulmar.mission_dic_manager import read_json_dic
+
 ##############################################################################
 
 
@@ -34,6 +42,197 @@ from fulmar.utils import (
 #     pass
 
 ##############################################################################
+
+
+def mission_identifier(target):
+    """Identifies the mission ('Kepler', 'K2' or 'TESS') from the identifier
+    of the target.
+
+    Parameters
+    ----------
+    target : str or int
+        Name of the target as a string, e.g. "TOI-175" or, if mission is
+        passed as the numerical identifier of the input catalog.
+
+    Returns
+    -------
+    mission : str
+        'Kepler', 'K2' or 'TESS'
+
+
+    Raises
+    ------
+    TargError
+        If the target was not resolved or linked to a supported mission
+    """
+    if not isinstance(target, str):
+        target = str(target)
+
+    # Deal with dot as a separator. e.g "TOI-175.01"
+    target = target.split('.')[0]
+
+    if target[:3].upper() == 'TIC':
+        mission = 'TESS'
+
+    elif target[:3].upper() == 'TOI':
+        mission = 'TESS'
+
+    elif target[:3].upper() == 'KIC':
+        mission = 'Kepler'
+
+    elif target[:3].upper() == 'KEP':
+        mission = 'Kepler'
+
+    elif target[:4].upper() == 'EPIC':
+        mission = 'K2'
+
+    elif target[:2].upper() == 'K2':
+        mission = 'K2'
+
+    else:
+        raise ValueError(
+            "targname {} could not be linked to a supported mission " +
+            "('Kepler', 'K2' or 'TESS')".format(str(target)))
+
+    return mission
+
+
+def target_identifier(self, target, mission=None):
+    """Translates the target identifiers between different catalogs
+    such as TIC to TOI in the case of TESS or EPIC to KIC" for K2
+
+    Parameters
+    ----------
+    target : str or int
+        Name of the target as a string, e.g. "TOI-175" or, if mission is
+        passed as the numerical identifier of the input catalog.
+    mission : str, optional
+        'Kepler', 'K2' or 'TESS'
+
+    Returns
+    -------
+    inputCatalogID : str
+        Identifier in the format of the input catalog, e.g. "TIC307210830"
+    missionCatalogID : str
+        Identifier in the format of the mission catalog, e.g. "TOI-175"
+    ICnum : int
+        Number of the input catalog, e.g. "307210830"
+
+    Raises
+    ------
+    TargError
+        If the target was not resolved or linked to a supported mission
+    """
+    if isinstance(target, int):
+        target = str(target)
+
+        if mission == 'TESS':
+            inputCatalogID = 'TIC' + target
+            tic2toi = read_json_dic(
+                path.join(fulmar_constants.fulmar_dir, 'TIC2TOI.json'))
+            missionCatalogID = tic2toi[inputCatalogID]
+            ICnum = int(inputCatalogID[3:])
+            warnings.warn('No prefix was passed, target is assumed to be ' +
+                          'TIC {}'.format(ICnum), FulmarWarning)
+
+        elif mission == 'Kepler':
+            inputCatalogID = 'KIC' + target
+            kic2kepler = read_json_dic(
+                path.join(fulmar_constants.fulmar_dir, 'KIC2Kepler.json'))
+            missionCatalogID = kic2kepler[inputCatalogID]
+            ICnum = int(inputCatalogID[3:])
+            if (ICnum < 1) or (ICnum > 13161029):
+                raise ValueError("KIC ID must be in range 1 to 13161029")
+            warnings.warn('No prefix was passed, target is assumed to be ' +
+                          'KIC {}'.format(ICnum), FulmarWarning)
+
+        elif mission == 'K2':
+            inputCatalogID = 'EPIC' + target
+            epic2k2 = read_json_dic(
+                path.join(fulmar_constants.fulmar_dir, 'EPIC2K2.json'))
+            missionCatalogID = epic2k2[inputCatalogID]
+            ICnum = int(inputCatalogID[4:])
+            if (ICnum < 201000001) or (ICnum > 251813738):
+                raise ValueError(
+                    "EPIC ID must be in range 201000001 to 251813738")
+            warnings.warn('No prefix was passed, target is assumed to be ' +
+                          'EPIC {}'.format(ICnum), FulmarWarning)
+        elif mission is None:
+            raise ValueError('mission parameter should be passed ' +
+                             'when target is int.')
+        else:
+            raise ValueError("mission {} could not be linked to a " +
+                             "supported mission ('Kepler', 'K2' or 'TESS')".format(
+                                 mission))
+
+    elif isinstance(target, str):
+
+        # Deal with dot as a separator. e.g "TOI-175.01"
+        target = target.split('.')[0]
+
+        if target[:3].upper() == 'TIC':
+            inputCatalogID = 'TIC' + str(''.join(filter(str.isdigit, target)))
+            tic2toi = read_json_dic(
+                path.join(fulmar_constants.fulmar_dir, 'TIC2TOI.json'))
+            missionCatalogID = tic2toi[inputCatalogID]
+            ICnum = int(inputCatalogID[3:])
+
+        elif target[:3].upper() == 'TOI':
+            missionCatalogID = 'TOI-' + \
+                str(''.join(filter(str.isdigit, target)))
+            toi2tic = read_json_dic(
+                path.join(fulmar_constants.fulmar_dir, 'TOI2TIC.json'))
+            inputCatalogID = toi2tic[missionCatalogID]
+            ICnum = int(inputCatalogID[3:])
+
+        elif target[:3].upper() == 'KIC':
+            inputCatalogID = 'KIC' + str(''.join(filter(str.isdigit, target)))
+            kic2kepler = read_json_dic(
+                path.join(fulmar_constants.fulmar_dir, 'KIC2Kepler.json'))
+            missionCatalogID = kic2kepler[inputCatalogID]
+            ICnum = int(inputCatalogID[3:])
+            if (ICnum < 1) or (ICnum > 13161029):
+                raise ValueError("KIC ID must be in range 1 to 13161029")
+
+        elif target[:3].upper() == 'KEP':
+            missionCatalogID = 'Kepler-' + \
+                str(''.join(filter(str.isdigit, target)))
+            kep2kic = read_json_dic(
+                path.join(fulmar_constants.fulmar_dir, 'Kepler2KIC.json'))
+            inputCatalogID = kep2kic[missionCatalogID]
+            ICnum = int(inputCatalogID[3:])
+            if (ICnum < 1) or (ICnum > 13161029):
+                raise ValueError("KIC ID must be in range 1 to 13161029")
+
+        elif target[:4].upper() == 'EPIC':
+            inputCatalogID = 'EPIC' + str(''.join(filter(str.isdigit, target)))
+            epic2k2 = read_json_dic(
+                path.join(fulmar_constants.fulmar_dir, 'EPIC2K2.json'))
+            missionCatalogID = epic2k2[inputCatalogID]
+            ICnum = int(inputCatalogID[4:])
+            if (ICnum < 201000001) or (ICnum > 251813738):
+                raise ValueError(
+                    "EPIC ID must be in range 201000001 to 251813738")
+
+        elif target[:2].upper() == 'K2':
+            missionCatalogID = 'K2-' + \
+                str(''.join(filter(str.isdigit, target[2:])))
+            k22epic = read_json_dic(
+                path.join(fulmar_constants.fulmar_dir, 'K22EPIC.json'))
+            inputCatalogID = k22epic[missionCatalogID]
+            ICnum = int(inputCatalogID[4:])
+            if (ICnum < 201000001) or (ICnum > 251813738):
+                raise ValueError(
+                    "EPIC ID must be in range 201000001 to 251813738")
+        else:
+            raise ValueError(
+                'targname {} could not be linked to ' +
+                'a supported mission'.format(target))
+
+    else:
+        raise ValueError('target should be str or int')
+
+    return inputCatalogID, missionCatalogID, ICnum
 
 
 def read_lc_from_file(
@@ -48,15 +247,15 @@ def read_lc_from_file(
     ----------
     file : str
         Path to the file containing the light curve data.
-    author : str (optional)
+    author : str, optional.
         Name of the pipeline used to reduce the data.
-    exptime : float (optional)
+    exptime : `~astropy.units.Quantity` or float, optional.
         Exposure time of the observation, in seconds.
-    timeformat : str
+    timeformat : str, optional.
         Format of the Time values. Should be 'rjd', 'bkjd', 'btjd', or a valid
         `~astropy.time.Time` format. Refer to the docs here:
         (https://docs.astropy.org/en/stable/time/index.html#time-format)
-    colnames : list (of str) (optional)
+    colnames : list (of str), optional.
         Names of the columns. Should have the same number of
         items as the number of columns.
 
@@ -72,17 +271,36 @@ def read_lc_from_file(
             t_1 = Table.read(file)
         except IORegistryError:  # Helps the astropy reader
             t_1 = Table.read(file, format='ascii', comment='#')
-        if colnames is not None:
+
+        if colnames is None:
+            if t_1.colnames[0] == 'col1':
+                t_1.rename_column('col1', 'time')
+                t_1.rename_column('col2', 'flux')
+                if len(t_1.colnames) > 2:
+                    t_1.rename_column('col3', 'flux_err')
+            colnames = t_1.colnames
+        else:
             try:
                 t_1 = Table(t_1, names=colnames)
             except ValueError:
-                warnings.warn('number of items in colnames should match \
-                    the number of columns in the data', FulmarWarning)
-        elif t_1.colnames[0] == 'col1':
-            t_1.rename_column('col1', 'time')
-            t_1.rename_column('col2', 'flux')
-            if len(t_1.colnames) > 2:
-                t_1.rename_column('col3', 'flux_err')
+                warnings.warn('number of items in colnames should match ' +
+                              'the number of columns in the data',
+                              FulmarWarning)            
+
+        if 'time' not in colnames:
+            raise ValueError("A 'time' column is required")
+        if 'flux' not in colnames:
+            raise ValueError("A 'flux' column is required")
+        if len(colnames) > 2 and 'flux_err' not in colnames:
+            warnings.warn(
+                "No 'flux_err' column was passed, 'flux_err' set to Nan",
+                FulmarWarning)
+
+        # elif t_1.colnames[0] == 'col1':
+        #     t_1.rename_column('col1', 'time')
+        #     t_1.rename_column('col2', 'flux')
+        #     if len(t_1.colnames) > 2:
+        #         t_1.rename_column('col3', 'flux_err')
 
         if timeformat is not None:
             t_1.rename_column('time', 'no_unit_time')
@@ -109,7 +327,14 @@ def read_lc_from_file(
             lc.meta['AUTHOR'] = author
 
     if exptime is not None:
-        lc.meta['EXPTIME'] = exptime
+        if isinstance(exptime, float):
+            exptime = exptime * u.s
+    else:
+        dt = (lc.time[1] - lc.time[0]).to(u.s)
+        exptime = round(dt.value) * u.s
+
+    lc.meta['EXPTIME'] = exptime
+    lc['exptime'] = np.ones(len(lc)) * exptime
 
     return lc
 
@@ -192,7 +417,7 @@ def time_flux_err(
         flux_kw='flux',
         flux_err_kw='flux_err',
         replace_nan_err=True):
-    """Returns 3 arrays with time, flux and flux_err.
+    """Extracts 3 arrays with time, flux and flux_err from a TimeSeries.
 
     Parameters
     ----------
@@ -281,11 +506,11 @@ def fbn(timeseries, period, epoch0, duration=3 * u.h, nbin=40):
     ----------
     timeseries : `~astropy.timeseries.TimeSeries`
         TimeSeries object
-    period : '~astropy.time.Time' or float
+    period : `~astropy.time.Time` or float
         The period to use for folding.
-    epoch0 : '~astropy.units.Quantity' or float
+    epoch0 : `~astropy.units.Quantity` or float
         The time to use as the reference epoch.
-    duration : '~astropy.units.Quantity' or float, optional
+    duration : `~astropy.units.Quantity` or float, optional
         Duration of the transit. (Default is 3 hours)
     nbin : int, optional
         Number of bins in the transit window. (Default is 40)
@@ -521,6 +746,7 @@ def GP_fit(time, flux, flux_err=None, mode='rotation',
     flat_samps = trace.posterior.stack(sample=("chain", "draw"))
     return trace, flat_samps
 
+
 def params_optimizer(timeseries, period_guess, t0_guess, depth_guess, ab, r_star, target_id, tran_window=0.25, ncores=None, mask=None):
     if ncores is None:
         ncores = multiprocessing.cpu_count()
@@ -591,6 +817,8 @@ def params_optimizer(timeseries, period_guess, t0_guess, depth_guess, ab, r_star
 
         # We're going to track the implied density
         pm.Deterministic("rho_circ", orbit.rho_star)
+
+        pm.Deterministic("incl", orbit.incl)
 
         # Set up the mean transit model
         light_curves = xo.LimbDarkLightCurve(
@@ -718,3 +946,134 @@ def params_optimizer(timeseries, period_guess, t0_guess, depth_guess, ab, r_star
         plt.show()
 
         return p, t0, dur, depth, ab, flat_samps
+
+
+def estimate_planet_mass(
+        R_p,
+        rho_p):
+    """
+    Estimates the mass of an exoplanet from its radius and density.
+
+    Parameters
+    ----------
+    R_p : `~astropy.units.Quantity` or float
+        Radius of the exolanet. (defaults to units of Earth radii)
+    rho_p : `~astropy.units.Quantity`, float or str
+        Density of the exoplanet in kg * m^-3. Can be "Earth" or "Neptune".
+
+    Returns
+    -------
+    M_planet : `~astropy.units.Quantity`
+        Estimated mass of the exoplanet.
+    """
+    dens_dic = {'earth': 5514 * (u.kg / u.m**3),
+                'neptune': 1638 * (u.kg / u.m**3)}
+
+    if isinstance(R_p, (int, float)):
+        R_p = R_p * u.earthRad
+
+    elif isinstance(R_p, u.Quantity):
+        R_p = R_p.to(u.earthRad)
+
+    else:
+        raise TypeError('R_p should be `astropy.units.Quantity` or float')
+
+    if isinstance(rho_p, (int, float)):
+        rho_p = rho_p * (u.kg / u.m**3)
+
+    elif isinstance(rho_p, str):
+        if rho_p.lower() in dens_dic.keys():
+            rho_p = dens_dic[rho_p.lower()]
+        else:
+            raise ValueError(
+                'Accepted str values for rho_p are "Earth" and "Neptune.')
+    else:
+        raise TypeError(
+            'rho_p should be `astropy.units.Quantity`, float or str.')
+
+    M_planet = (R_p.value ** 3 * rho_p / dens_dic['earth']) * u.earthMass
+    return M_planet
+
+
+def estimate_semi_amplitude(
+        period,
+        M_star,
+        M_planet=None,
+        R_planet=None,
+        rho_planet=None,
+        inc=90 * u.deg,
+        ecc=0):
+    """
+    Estimates the radial velocity semi-amplitude corresponding to a planet of
+    given parameters.
+
+    Parameters
+    ----------
+    period : `~astropy.units.Quantity` or float
+        The period to use for folding. (defaults to units of days)
+    M_star : `~astropy.units.Quantity` or float
+        Stellar mass (defaults to units of solar masses)
+    M_planet : `~astropy.units.Quantity` or float
+        Mass of the exolanet. (defaults to units of Earth masses)
+    R_p : `~astropy.units.Quantity` or float
+        Radius of the exolanet. (defaults to units of Earth radii)
+    rho_p : `~astropy.units.Quantity`, float or str
+        Density of the exoplanet in kg * m^-3. Can be "Earth" or "Neptune".
+    inc : `~astropy.units.Quantity` or float
+        Orbital inclination (in degrees). Default: 90.
+    ecc : float
+        Orbital eccentricity. Default: 0.
+
+    Returns
+    -------
+    K : `~astropy.units.Quantity`
+        Estimated semi-amplitude of the RV.
+    """
+    if isinstance(period, (int, float)):
+        period = period * u.d
+    elif not isinstance(period, u.Quantity):
+        raise TypeError(
+            'shoud be ```astropy.units.Quantity` or float')
+
+    if isinstance(M_star, (int, float)):
+        M_star = M_star * u.solMass
+    elif not isinstance(M_star, u.Quantity):
+        raise TypeError(
+            'shoud be ```astropy.units.Quantity` or float')
+
+    if isinstance(inc, (int, float)):
+        inc = inc * u.deg
+    elif not isinstance(inc, u.Quantity):
+        raise TypeError(
+            'shoud be ```astropy.units.Quantity` or float')
+
+    if M_planet is None:
+        if R_planet is None or rho_planet is None:
+            raise ValueError('R_planet and rho_planet are both required ' +
+                             'when M_planet is not given')
+        else:
+            M_planet = estimate_planet_mass(R_planet, rho_planet)
+    else:
+        if R_planet is not None or rho_planet is not None:
+            warnings.warn(
+                'M_planet overrides R_planet and rho_planet', FulmarWarning)
+
+        if isinstance(M_planet, (int, float)):
+            M_planet = M_planet * u.earthMass
+
+        elif not isinstance(M_planet, u.Quantity):
+            raise TypeError(
+                'M_planet should be `astropy.units.Quantity` or float')
+
+    inc = inc.to(u.deg)
+
+    M_p_jovian = M_planet.to(u.jupiterMass).value
+    M_tot_solar = (M_star + M_planet).to(u.solMass).value
+
+    # Formula (14) from Lovis & Fischer 2010
+    K = 28.4329 * (u.m / u.s) * \
+        M_p_jovian * \
+        np.sin(inc) * np.power(M_tot_solar, -2 / 3) * \
+        np.power(period.to(u.year).value, -1 / 3) / np.sqrt(1 - ecc)
+
+    return K
