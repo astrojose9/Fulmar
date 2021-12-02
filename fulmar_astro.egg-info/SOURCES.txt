@@ -20,7 +20,6 @@ docs/_build/html/.buildinfo
 docs/_build/html/api.html
 docs/_build/html/genindex.html
 docs/_build/html/index.html
-docs/_build/html/installation.html
 docs/_build/html/objects.inv
 docs/_build/html/search.html
 docs/_build/html/searchindex.js
@@ -74,7 +73,6 @@ docs/source/FULMAR_logo_name.png
 docs/source/FULMAR_logo_title.png
 docs/source/conf.py
 docs/source/index.rst
-docs/source/installation.rst
 docs/source/requirements.txt
 fulmar/EPIC2K2.json
 fulmar/K22EPIC.json

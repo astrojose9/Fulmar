@@ -91,13 +91,13 @@ def mission_identifier(target):
 
     else:
         raise ValueError(
-            "targname {} could not be linked to a supported mission " +
+            "targname {} could not be linked to a supported mission "
             "('Kepler', 'K2' or 'TESS')".format(str(target)))
 
     return mission
 
 
-def target_identifier(self, target, mission=None):
+def target_identifier(target, mission=None):
     """Translates the target identifiers between different catalogs
     such as TIC to TOI in the case of TESS or EPIC to KIC" for K2
 
@@ -113,8 +113,9 @@ def target_identifier(self, target, mission=None):
     -------
     inputCatalogID : str
         Identifier in the format of the input catalog, e.g. "TIC307210830"
-    missionCatalogID : str
-        Identifier in the format of the mission catalog, e.g. "TOI-175"
+    missionCatalogID : str or None
+        Identifier in the format of the mission catalog, e.g. "TOI-175".
+        None if no ID was found.
     ICnum : int
         Number of the input catalog, e.g. "307210830"
 
@@ -130,39 +131,63 @@ def target_identifier(self, target, mission=None):
             inputCatalogID = 'TIC' + target
             tic2toi = read_json_dic(
                 path.join(fulmar_constants.fulmar_dir, 'TIC2TOI.json'))
-            missionCatalogID = tic2toi[inputCatalogID]
+            try:
+                missionCatalogID = tic2toi[inputCatalogID]
+            except KeyError:
+                warnings.warn('Could not find a TOI identifier for {}.'.format(
+                    inputCatalogID) + ' TOI set to None', FulmarWarning)
+                missionCatalogID = None
+
             ICnum = int(inputCatalogID[3:])
-            warnings.warn('No prefix was passed, target is assumed to be ' +
+            warnings.warn('No prefix was passed, target is assumed to be '
                           'TIC {}'.format(ICnum), FulmarWarning)
 
         elif mission == 'Kepler':
             inputCatalogID = 'KIC' + target
             kic2kepler = read_json_dic(
                 path.join(fulmar_constants.fulmar_dir, 'KIC2Kepler.json'))
-            missionCatalogID = kic2kepler[inputCatalogID]
+
+            try:
+                missionCatalogID = kic2kepler[inputCatalogID]
+            except KeyError:
+                warnings.warn('Could not find a Kepler identifier '
+                              'for {}.'.format(
+                                  inputCatalogID) + ' Kepler set to None',
+                              FulmarWarning)
+                missionCatalogID = None
             ICnum = int(inputCatalogID[3:])
             if (ICnum < 1) or (ICnum > 13161029):
                 raise ValueError("KIC ID must be in range 1 to 13161029")
-            warnings.warn('No prefix was passed, target is assumed to be ' +
+            warnings.warn('No prefix was passed, target is assumed to be '
                           'KIC {}'.format(ICnum), FulmarWarning)
 
         elif mission == 'K2':
             inputCatalogID = 'EPIC' + target
             epic2k2 = read_json_dic(
                 path.join(fulmar_constants.fulmar_dir, 'EPIC2K2.json'))
-            missionCatalogID = epic2k2[inputCatalogID]
+
+            try:
+                missionCatalogID = epic2k2[inputCatalogID]
+            except KeyError:
+                warnings.warn('Could not find a K2 identifier '
+                              'for {}.'.format(
+                                  inputCatalogID) + ' K2 set to None',
+                              FulmarWarning)
+                missionCatalogID = None
+
             ICnum = int(inputCatalogID[4:])
             if (ICnum < 201000001) or (ICnum > 251813738):
                 raise ValueError(
                     "EPIC ID must be in range 201000001 to 251813738")
-            warnings.warn('No prefix was passed, target is assumed to be ' +
+            warnings.warn('No prefix was passed, target is assumed to be '
                           'EPIC {}'.format(ICnum), FulmarWarning)
+
         elif mission is None:
-            raise ValueError('mission parameter should be passed ' +
+            raise ValueError('mission parameter should be passed '
                              'when target is int.')
         else:
-            raise ValueError("mission {} could not be linked to a " +
-                             "supported mission ('Kepler', 'K2' or 'TESS')".format(
+            raise ValueError("mission {} could not be linked to a supported "
+                             "mission ('Kepler', 'K2' or 'TESS')".format(
                                  mission))
 
     elif isinstance(target, str):
@@ -174,7 +199,13 @@ def target_identifier(self, target, mission=None):
             inputCatalogID = 'TIC' + str(''.join(filter(str.isdigit, target)))
             tic2toi = read_json_dic(
                 path.join(fulmar_constants.fulmar_dir, 'TIC2TOI.json'))
-            missionCatalogID = tic2toi[inputCatalogID]
+            try:
+                missionCatalogID = tic2toi[inputCatalogID]
+            except KeyError:
+                warnings.warn('Could not find a TOI identifier for {}.'.format(
+                    inputCatalogID) + ' TOI set to None', FulmarWarning)
+                missionCatalogID = None
+
             ICnum = int(inputCatalogID[3:])
 
         elif target[:3].upper() == 'TOI':
@@ -189,7 +220,15 @@ def target_identifier(self, target, mission=None):
             inputCatalogID = 'KIC' + str(''.join(filter(str.isdigit, target)))
             kic2kepler = read_json_dic(
                 path.join(fulmar_constants.fulmar_dir, 'KIC2Kepler.json'))
-            missionCatalogID = kic2kepler[inputCatalogID]
+            try:
+                missionCatalogID = kic2kepler[inputCatalogID]
+            except KeyError:
+                warnings.warn('Could not find a Kepler identifier '
+                              'for {}.'.format(
+                                  inputCatalogID) + ' Kepler set to None',
+                              FulmarWarning)
+                missionCatalogID = None
+
             ICnum = int(inputCatalogID[3:])
             if (ICnum < 1) or (ICnum > 13161029):
                 raise ValueError("KIC ID must be in range 1 to 13161029")
@@ -208,7 +247,15 @@ def target_identifier(self, target, mission=None):
             inputCatalogID = 'EPIC' + str(''.join(filter(str.isdigit, target)))
             epic2k2 = read_json_dic(
                 path.join(fulmar_constants.fulmar_dir, 'EPIC2K2.json'))
-            missionCatalogID = epic2k2[inputCatalogID]
+
+            try:
+                missionCatalogID = epic2k2[inputCatalogID]
+            except KeyError:
+                warnings.warn('Could not find a K2 identifier '
+                              'for {}.'.format(
+                                  inputCatalogID) + ' K2 set to None',
+                              FulmarWarning)
+                missionCatalogID = None
             ICnum = int(inputCatalogID[4:])
             if (ICnum < 201000001) or (ICnum > 251813738):
                 raise ValueError(
@@ -226,7 +273,7 @@ def target_identifier(self, target, mission=None):
                     "EPIC ID must be in range 201000001 to 251813738")
         else:
             raise ValueError(
-                'targname {} could not be linked to ' +
+                'targname {} could not be linked to '
                 'a supported mission'.format(target))
 
     else:
@@ -285,7 +332,7 @@ def read_lc_from_file(
             except ValueError:
                 warnings.warn('number of items in colnames should match ' +
                               'the number of columns in the data',
-                              FulmarWarning)            
+                              FulmarWarning)
 
         if 'time' not in colnames:
             raise ValueError("A 'time' column is required")

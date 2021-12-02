@@ -41,10 +41,11 @@ from fulmar.utils import (
     FulmarWarning,
     print_version,
     rjd_to_astropy_time,
-    TargError
+    warning_on_one_line
 )
 
 ##############################################################################
+warnings.formatwarning = warning_on_one_line
 
 
 class target:
@@ -273,7 +274,7 @@ class target:
 
         if download is True:
             self.srch.download_all(download_dir=self.lc_folder)
-            self.lc_files = [path.as_posix() for path in Path(
+            self.lc_files = [pth.as_posix() for pth in Path(
                 self.lc_folder).rglob('*lc.fits')]
 
         sctrs = np.unique(self.srch.mission)
@@ -306,8 +307,11 @@ class target:
         lc_col = lk.LightCurveCollection([])
 
         if filelist is None:
+            print('Searching for lightcurves')
             srch = self.search_data(author=author,
                                     exptime=exptime, download=True)
+            print(len(srch), 'Lightcurves found')
+            print('Downloading Lightcurves')
             lc_col = srch.download_all()
 
             # Add an exptime column
@@ -346,6 +350,7 @@ class target:
                                                 colnames=colnames))
         stitched_lc = lc_col.stitch(corrector_func=lambda x: normalize_lc(x))
         self.ts_stitch = TimeSeries(stitched_lc)
+        self.ts_stitch.sort('time')
         return self.ts_stitch
 
     # Work the data
@@ -376,53 +381,223 @@ class target:
 
         if timeseries is None:
             flux = self.ts_stitch[self.flux_kw]
+            exptimes = self.ts_stitch['exptime']
 
         else:
             flux = timeseries[self.flux_kw]
+            exptimes = timeseries['exptime']
 
         if len(flux) == 0:
             warnings.warn('flux is empty. Try updating the flux_kw',
                           FulmarWarning)
 
-        robustmean, robustmedian, robustrms = sigma_clipped_stats(
-            flux, sigma=sigma, maxiters=10)
+        # Creating the mask to be returned
+        clean = np.full(len(flux), False, dtype=bool)
 
-        # remove bottom outliers with a sigma clipping
-        # Indices of invalid data
-        cleanlow = np.where((flux - robustmean) / robustrms < -sigma)[0]
+        # Mask for each exptime
+        for exp in np.unique(exptimes):
+            mask_exp = np.array(exptimes == exp)
 
-        # finding 3 consecutive outliers (for transits)
-        diff = -(cleanlow - np.roll(cleanlow, -1))
-        diff2 = (cleanlow - np.roll(cleanlow, 1))
-        flux4 = flux.copy()
+            # Compute robust stats
+            robustmean, robustmedian, robustrms = sigma_clipped_stats(
+                flux[mask_exp], sigma=sigma, maxiters=10)
 
-        for i in range(0, len(cleanlow)):
+            # Remove bottom outliers with a sigma clipping
+            # Possible lower outliers
+            low_out = np.less((flux - robustmean) / robustrms, -sigma)
+            # Combine with the correct exptime mask
+            low_out_exp = np.logical_and(mask_exp, low_out)
+            # Indices of invalid data
+            cleanlow = np.where(low_out_exp)[0]
 
-            if np.logical_and(np.not_equal(diff[i], 1),
-                              np.not_equal(diff2[i],
-                                           1)):  # true outliers are set to 0
-                flux4[cleanlow[i]] = 0
+            # finding 3 consecutive outliers (for transits)
+            diff = -(cleanlow - np.roll(cleanlow, -1))
+            diff2 = (cleanlow - np.roll(cleanlow, 1))
+            flux4 = flux.copy()
 
-        # Creating the mask
-        clean = np.logical_and(np.less((flux - robustmean) / robustrms, sigma),
-                               np.not_equal(flux4, 0))
+            for i in range(0, len(cleanlow)):
 
-        # If sigma_upper or sigma_lower are passed, combines it with the
-        # Previous mask, not caring for transits
-        if sigma_upper is not None or sigma_lower is not None:
-            clip = sigma_clip(flux, sigma_upper=sigma_upper,
-                              sigma_lower=sigma_lower)
-            mask = np.logical_or(~clean, clip.mask)  # Outliers flagged as True
-            return ~mask
+                if np.logical_and(np.not_equal(diff[i], 1),
+                                  np.not_equal(diff2[i],
+                                               1)):  # Outliers are set to 0
+                    flux4[cleanlow[i]] = 0
+
+            # Creating the mask for this exptime
+            # Upper outliers as False
+            up_out = np.less((flux - robustmean) / robustrms, sigma)
+            up_out_exp = np.logical_and(mask_exp, up_out)
+
+            # Combining the masks to keep valid data
+            clean_exp = np.logical_and(up_out_exp, np.not_equal(flux4, 0))
+
+            # If sigma_upper or sigma_lower are passed, combines it with the
+            # Previous mask, not caring for transits
+            if sigma_upper is not None or sigma_lower is not None:
+                # clip = sigma_clip(flux, sigma_upper=sigma_upper,
+                #                   sigma_lower=sigma_lower)
+
+                clip_top = np.greater(
+                    (flux - robustmean) / robustrms, sigma_upper)
+                clip_low = np.less(
+                    (flux - robustmean) / robustrms, -sigma_lower)
+                clip = np.logical_or(clip_low, clip_top)  # Outliers are True
+                clip_exp = np.logical_and(
+                    ~clip, mask_exp)  # Outliers are False
+
+                # Update the mask to be returned
+                clean = np.logical_or(clean, clip_exp)
+
+            else:
+                clean = np.logical_or(clean, clean_exp)
 
         return clean
 
+    # def clean_subt_activity_flatten(
+    #         self,
+    #         timeseries=None,
+    #         sigma=3,
+    #         wl=1501,
+    #         time_window=18 * u.h,
+    #         polyorder=2,
+    #         return_trend=False,
+    #         remove_outliers=True,
+    #         break_tolerance=5,
+    #         niters=3,
+    #         mask=None):
+    #     """Removes the low frequency trend using scipy's Savitzky-Golay filter.
+    #     This method wraps `scipy.signal.savgol_filter`.
+    #     Parameters
+    #     ----------
+    #     sigma : float, optional
+    #         Number of standard deviations to use for the clipping limit.
+    #     timeseries : `~astropy.timeseries.TimeSeries`, optional
+    #         TimeSeries ot Table object containing the data to filter
+    #     wl : int, optional
+    #         Window_length
+    #         The length of the filter window (i.e. the number of coefficients).
+    #         ``window_length`` must be a positive odd integer.
+    #     time_window : '~astropy.units.Quantity' or float, optional
+    #         Time length of the filter window. Window_lenght will be set to the
+    #         closest odd integer taking exposition time into account.
+    #         Overrides wl.
+    #     polyorder : int, optional
+    #         The order of the polynomial used to fit the samples. ``polyorder``
+    #         must be less than window_length.
+    #     return_trend : bool, optional
+    #         If `True`, the method will return a tuple of two elements
+    #         (ts_clean, trend_ts) where trend_ts is the removed trend.
+    #     remove_outliers : bool
+    #         If 'True', the method uses mask_outliers to created a mask of valid
+    #         datapoints to be applied to the products before returning them.
+    #     break_tolerance : int, optional
+    #         If there are large gaps in time, flatten will split the flux into
+    #         several sub-lightcurves and apply `savgol_filter` to each
+    #         individually. A gap is defined as a period in time larger than
+    #         `break_tolerance` times the median gap.  To disable this feature,
+    #         set `break_tolerance` to None.
+    #     niters : int, optional
+    #         Number of iterations to iteratively sigma clip and flatten. If more
+    #         than one, will perform the flatten several times,
+    #         removing outliers each time.
+
+    #     mask : boolean array with length of time, optional
+    #         Boolean array to mask data with before flattening. Flux values
+    #         where mask is True will not be used to flatten the data. An
+    #         interpolated result will be provided for these points. Use this
+    #         mask to remove data you want to preserve, e.g. transits.
+
+    #     Returns
+    #     -------
+    #     ts_clean : `~astropy.timeseries.TimeSeries`
+    #         New `TimeSeries` object with long-term trends removed.
+    #     If ``return_trend`` is set to ``True``, this method will also return:
+    #     trend_ts : `~astropy.timeseries.TimeSeries`
+    #         New `TimeSeries` object containing the trend that was removed from
+    #         the flux.
+    #     """
+    #     if timeseries is None:
+    #         self.ts_clean = self.ts_stitch.copy()
+
+    #     else:
+    #         self.ts_clean = timeseries.copy()
+
+    #     flux = self.ts_clean[self.flux_kw]
+    #     lc = lk.LightCurve(self.ts_clean)
+
+    #     if mask is None:
+    #         mask = np.full_like(self.ts_clean.time.value, False, dtype=bool)
+
+    #     # Inital robust stats
+    #     robustmean1, robustmedian1, robustrms1 = sigma_clipped_stats(
+    #         flux, sigma=sigma, maxiters=10, mask=mask)
+
+    #     if time_window is not None:
+    #         if isinstance(time_window, float):
+    #             time_window = time_window * u.d
+    #         # observation time interval
+    #         dt = (self.ts_clean.time[1] - self.ts_clean.time[0]).to(
+    #             time_window.unit)
+    #         nobs = round((time_window / dt).value)
+    #         # make sure the number is odd
+    #         wl = nobs + 1 - (nobs % 2)
+
+    #     # prefiltering
+    #     # lc = lk.LightCurve(time=self.ts_stitch.time.value,
+    #     #                    flux=self.ts_stitch[self.flux_kw + '_norm'].value,
+    #     #                    flux_err=self.ts_stitch[self.flux_err_kw].value)
+
+    #     clc = lc.flatten(window_length=wl,
+    #                      polyorder=polyorder,
+    #                      break_tolerance=break_tolerance,
+    #                      sigma=sigma,
+    #                      mask=mask)
+
+    #     flux_filtered1 = clc.flux
+
+    #     # sigma clipping for big transits
+    #     clip = sigma_clip(flux_filtered1, sigma)
+
+    #     finflat = lc.flatten(window_length=wl, polyorder=polyorder,
+    #                          break_tolerance=break_tolerance, sigma=sigma,
+    #                          return_trend=True, mask=clip.mask)
+
+    #     clc1 = finflat[0]
+    #     trend_ts = TimeSeries(finflat[1])
+
+    #     flux_filtered = clc1.flux
+
+    #     # Final robust stats
+    #     robustmean, robustmedian, robustrms = sigma_clipped_stats(
+    #         flux_filtered, sigma=sigma, maxiters=10, mask=mask)
+
+    #     # Warn the user if std_dev is bigger than the initial.
+    #     if robustrms > robustrms1:
+    #         warnings.warn('Standard deviaton of the flux did not decrease \
+    #             after filtering (before : {}, after : {}). Try using a mask\
+    #             for the transits' .format(robustrms1, robustrms),
+    #                       FulmarWarning)
+
+    #     self.ts_clean[self.flux_kw] = flux_filtered
+
+    #     if remove_outliers is True:
+    #         out_mask = self.mask_outliers(timeseries=self.ts_clean,
+    #                                       sigma=sigma)
+    #         self.ts_clean = self.ts_clean[out_mask]
+
+    #         trend_ts = trend_ts[out_mask]
+
+    #     if return_trend is True:
+    #         trend_ts = trend_ts[out_mask]
+
+    #         return self.ts_clean, trend_ts
+
+    #     return self.ts_clean
     def clean_subt_activity_flatten(
             self,
             timeseries=None,
             sigma=3,
             wl=1501,
-            time_window=None,
+            time_window=18 * u.h,
             polyorder=2,
             return_trend=False,
             remove_outliers=True,
@@ -437,14 +612,14 @@ class target:
             Number of standard deviations to use for the clipping limit.
         timeseries : `~astropy.timeseries.TimeSeries`, optional
             TimeSeries ot Table object containing the data to filter
-        wl : int
+        wl : int, optional
             Window_length
             The length of the filter window (i.e. the number of coefficients).
             ``window_length`` must be a positive odd integer.
         time_window : '~astropy.units.Quantity' or float, optional
             Time length of the filter window. Window_lenght will be set to the
             closest odd integer taking exposition time into account.
-            Overrules wl.
+            Overrides wl.
         polyorder : int, optional
             The order of the polynomial used to fit the samples. ``polyorder``
             must be less than window_length.
@@ -486,63 +661,97 @@ class target:
         else:
             self.ts_clean = timeseries.copy()
 
-        flux = self.ts_stitch[self.flux_kw]
-        lc = lk.LightCurve(self.ts_stitch)
-
-        if mask is None:
-            mask = np.full_like(self.ts_clean.time.value, False, dtype=bool)
-
-        # Inital robust stats
-        robustmean1, robustmedian1, robustrms1 = sigma_clipped_stats(
-            flux, sigma=sigma, maxiters=10, mask=mask)
+        exptimes = self.ts_clean['exptime']
 
         if time_window is not None:
             if isinstance(time_window, float):
                 time_window = time_window * u.d
-            # observation time interval
-            dt = (self.ts_clean.time[1] - self.ts_clean.time[0]).to(
-                time_window.unit)
-            nobs = round((time_window / dt).value)
-            # make sure the number is odd
-            wl = nobs + 1 - (nobs % 2)
+        else:
+            if len(np.unique(exptimes)) > 1:
+                warnings.warn('You are using a fixed window lenght'
+                              'wl = {} but you have '.format(wl) + 'multiple '
+                              'exptimes ({}).'.format(exptimes) + 'This will '
+                              'result in a variable time_window for the '
+                              'SG filter. Which you do not want.'
+                              'Try setting a time_window instead',
+                              FulmarWarning)
+
+        # flux = self.ts_clean[self.flux_kw]
+        # lc = lk.LightCurve(self.ts_clean)
+
+        if mask is None:
+            mask = np.full(len(self.ts_clean), False, dtype=bool)
+
+        clean_col = lk.LightCurveCollection([])
+        trend_col = lk.LightCurveCollection([])
+
+        for exp in np.unique(exptimes):
+            mask_exp = np.array(exptimes == exp)
+            flux = self.ts_clean[self.flux_kw][mask_exp]
+
+            # Compute robust stats
+            robustmean1, robustmedian1, robustrms1 = sigma_clipped_stats(
+                flux, sigma=sigma, maxiters=10, mask=mask[mask_exp])
+
+            lc = lk.LightCurve(self.ts_clean[mask_exp])
+
+        # # Inital robust stats
+        # robustmean1, robustmedian1, robustrms1 = sigma_clipped_stats(
+        #     flux, sigma=sigma, maxiters=10, mask=mask)
+
+        # Define the correct window_lenght
+            if time_window is not None:
+                # observation time interval
+                dt = exp.to(time_window.unit)
+                nobs = round((time_window / dt).value)
+                # make sure the number is odd
+                wl = nobs + 1 - (nobs % 2)
 
         # prefiltering
         # lc = lk.LightCurve(time=self.ts_stitch.time.value,
         #                    flux=self.ts_stitch[self.flux_kw + '_norm'].value,
         #                    flux_err=self.ts_stitch[self.flux_err_kw].value)
 
-        clc = lc.flatten(window_length=wl,
-                         polyorder=polyorder,
-                         break_tolerance=break_tolerance,
-                         sigma=sigma,
-                         mask=mask)
+            clc = lc.flatten(window_length=wl,
+                             polyorder=polyorder,
+                             break_tolerance=break_tolerance,
+                             sigma=sigma,
+                             mask=mask[mask_exp])
 
-        flux_filtered1 = clc.flux
+            flux_filtered1 = clc.flux
 
         # sigma clipping for big transits
-        clip = sigma_clip(flux_filtered1, sigma)
+            clip = sigma_clip(flux_filtered1, sigma)
 
-        finflat = lc.flatten(window_length=wl, polyorder=polyorder,
-                             break_tolerance=break_tolerance, sigma=sigma,
-                             return_trend=True, mask=clip.mask)
+            finflat = lc.flatten(window_length=wl, polyorder=polyorder,
+                                 break_tolerance=break_tolerance, sigma=sigma,
+                                 return_trend=True, mask=clip.mask)
 
-        clc1 = finflat[0]
-        trend_ts = TimeSeries(finflat[1])
+            # clc1 = finflat[0]
+            # trend_ts = TimeSeries(finflat[1])
 
-        flux_filtered = clc1.flux
+            clean_col.append(finflat[0])
+            trend_col.append(finflat[1])
 
-        # Final robust stats
-        robustmean, robustmedian, robustrms = sigma_clipped_stats(
-            flux_filtered, sigma=sigma, maxiters=10, mask=mask)
+            # Final robust stats
+            robustmean, robustmedian, robustrms = sigma_clipped_stats(
+                finflat[0].flux, sigma=sigma, maxiters=10, mask=mask[mask_exp])
 
-        # Warn the user if std_dev is bigger than the initial.
-        if robustrms > robustrms1:
-            warnings.warn('Standard deviaton of the flux did not decrease \
-                after filtering (before : {}, after : {}). Try using a mask\
-                for the transits' .format(robustrms1, robustrms),
-                          FulmarWarning)
+            # Warn the user if std_dev is bigger than the initial.
+            if robustrms > robustrms1:
+                warnings.warn('Standard deviaton of the flux did not decrease '
+                              'after filtering (before : {}, after : {}). Try '
+                              'using a mask for the transits' .format(
+                                  robustrms1, robustrms),
+                              FulmarWarning)
+
+        cleaned_lc = clean_col.stitch()
+        trend_ts = TimeSeries(trend_col.stitch())
+
+        flux_filtered = cleaned_lc.flux
 
         self.ts_clean[self.flux_kw] = flux_filtered
+        self.ts_clean.sort('time')
 
         if remove_outliers is True:
             out_mask = self.mask_outliers(timeseries=self.ts_clean,
