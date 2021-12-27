@@ -62,7 +62,7 @@ def mission_identifier(target):
 
     Raises
     ------
-    TargError
+    ValueError
         If the target was not resolved or linked to a supported mission
     """
     if not isinstance(target, str):
@@ -121,7 +121,7 @@ def target_identifier(target, mission=None):
 
     Raises
     ------
-    TargError
+    ValueError
         If the target was not resolved or linked to a supported mission
     """
     if isinstance(target, int):

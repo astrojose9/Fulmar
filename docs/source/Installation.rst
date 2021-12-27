@@ -4,13 +4,13 @@ Installation
 Using pip
 ---------
 
-FULMAR can be installed conveniently using pip:
+FULMAR can be installed conveniently using ``pip``:
 
 .. code-block:: bash
 
     pip install fulmar-astro
 
-If you have multiple versions of Python and pip on your machine, make sure to use pip3. Try:
+If you have multiple versions of Python and pip on your machine, make sure to use ``pip3``. Try:
 
 .. code-block:: bash
 

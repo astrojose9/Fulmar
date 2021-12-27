@@ -35,7 +35,10 @@ from fulmar.func import (
     time_flux_err,
     ts_binner,
     fbn,
-    GP_fit
+    GP_fit,
+    params_optimizer,
+    estimate_planet_mass,
+    estimate_semi_amplitude
 )
 from fulmar.utils import (
     FulmarWarning,
@@ -69,10 +72,10 @@ class target:
     M_star : float
         Stellar mass (in units of solar masses)
     M_star_min : float
-        1-sigma upper confidence interval on stellar mass
+        1-sigma lower confidence interval on stellar mass
         (in units of solar mass)
     M_star_max : float
-        1-sigma lower confidence interval on stellar mass
+        1-sigma upper confidence interval on stellar mass
         (in units of solar mass)
     R_star : float
         Stellar radius (in units of solar radii).
@@ -301,8 +304,8 @@ class target:
 
         Returns
         -------
-        ts_stitch : `~astropy.timeseries.TimeSeries`
-            TimeSeries object combining data from selected lightcurves.
+        ts_stitch : `astropy.timeseries.TimeSeries`
+            `TimeSeries` object combining data from selected lightcurves.
         """
         lc_col = lk.LightCurveCollection([])
 
@@ -597,7 +600,7 @@ class target:
             timeseries=None,
             sigma=3,
             wl=1501,
-            time_window=18 * u.h,
+            time_window=None,
             polyorder=2,
             return_trend=False,
             remove_outliers=True,
@@ -606,6 +609,7 @@ class target:
             mask=None):
         """Removes the low frequency trend using scipy's Savitzky-Golay filter.
         This method wraps `scipy.signal.savgol_filter`.
+
         Parameters
         ----------
         sigma : float, optional
@@ -619,7 +623,7 @@ class target:
         time_window : '~astropy.units.Quantity' or float, optional
             Time length of the filter window. Window_lenght will be set to the
             closest odd integer taking exposition time into account.
-            Overrides wl.
+            Overrides ``wl``.
         polyorder : int, optional
             The order of the polynomial used to fit the samples. ``polyorder``
             must be less than window_length.
@@ -1020,6 +1024,7 @@ class target:
             mask=None,
             **kwargs):
         """Computes the tls periodogram of the selected lightcurve
+
         Parameters
         ----------
         timeseries : `~astropy.timeseries.TimeSeries`, optional
@@ -1048,10 +1053,11 @@ class target:
         if timeseries is None:
 
             if cleaned is True:
-                t, y, y_err = time_flux_err(
-                    self.ts_clean,
-                    flux_kw=self.flux_kw,
-                    flux_err_kw=self.flux_err_kw)
+                timeseries = self.ts_clean
+                # t, y, y_err = time_flux_err(
+                #     self.ts_clean,
+                #     flux_kw=self.flux_kw,
+                #     flux_err_kw=self.flux_err_kw)
 
                 # t = self.ts_clean.time.value
                 # y = np.array(
@@ -1059,29 +1065,34 @@ class target:
                 # y_err = np.array(
                 #     self.ts_clean[self.flux_err_kw], dtype=np.float64)
             else:
-                t, y, y_err = time_flux_err(
-                    self.ts_stitch,
-                    flux_kw=self.flux_kw,
-                    flux_err_kw=self.flux_err_kw)
+                timeseries = self.ts_stitch
                 # t = self.ts_stitch.time.value
                 # y = np.array(
                 #     self.ts_stitch[self.flux_kw], dtype=np.float64)
                 # y_err = np.array(
                 #     self.ts_stitch[self.flux_err_kw], dtype=np.float64)
+
         else:
-            t, y, y_err = time_flux_err(
-                timeseries,
-                flux_kw=self.flux_kw,
-                flux_err_kw=self.flux_err_kw)
+            if mask is not None:
+                t, y, y_err = time_flux_err(
+                    timeseries,
+                    flux_kw=self.flux_kw,
+                    flux_err_kw=self.flux_err_kw)
+
+            else:  # intransit = True
+                t, y, y_err = time_flux_err(
+                    timeseries[~mask],
+                    flux_kw=self.flux_kw,
+                    flux_err_kw=self.flux_err_kw)
             # t = timeseries.time.value
             # y = np.array(timeseries[self.flux_kw], dtype=np.float64)
             # y_err = np.array(timeseries[self.flux_err_kw], dtype=np.float64)
 
         # Accounts for possible mask
-        if mask is not None:  # intransit = True
-            t = t[~mask]
-            y = y[~mask]
-            y_err = y_err[~mask]
+        # if mask is not None:  # intransit = True
+        #     t = t[~mask]
+        #     y = y[~mask]
+        #     y_err = y_err[~mask]
 
         # Initialize the tls model
 

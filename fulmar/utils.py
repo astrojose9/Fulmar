@@ -47,13 +47,12 @@ class FulmarWarning(Warning):
 def warning_on_one_line(message, category, filename, lineno,
                         file=None, line=None):
     """Function to display warnings on one line, as to avoid displaying
-    'warnings.warn('warning message')' under the 'warning message',
-    for clarity."""
+    'warnings.warn('warning message')' under the 'warning message', for clarity."""
     return ' %s:%s: %s: %s' % (filename, lineno, category.__name__, message)
 
 
 # warnings.formatwarning = warning_on_one_line
 def print_version():
-    """prints the version of fulmar used."""
+    """Prints the version of fulmar used."""
     print(FULMAR_VERSION_STR)
     return

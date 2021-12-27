@@ -2,8 +2,8 @@
 Adds the RJD time format for use by Astropy's `Time` object.
 Caution: AstroPy time objects make a distinction between a time's format
 (e.g. ISO, JD, MJD) and its scale (e.g. UTC, TDB).
-Note: the classes below derive from an AstroPy meta class which
-will automatically register the formats for use in AstroPy Time objects.
+Note: the class below derive from an `astropy` meta class which
+will automatically register the format for use in `astropy.time.Time` objects.
 """
 from astropy.time.formats import TimeFromEpoch
 
