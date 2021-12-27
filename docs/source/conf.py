@@ -10,10 +10,11 @@
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
-import os
-import sys
-sys.path.insert(0, os.path.abspath('/home/jrodrigues/Documents/PhD/fulmar'))
+# import os
+# import sys
+# sys.path.insert(0, os.path.abspath('/home/jrodrigues/Documents/PhD/fulmar'))
 
+import furo
 
 # -- Project information -----------------------------------------------------
 
@@ -28,7 +29,7 @@ author = 'José Rodrigues'
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = ['sphinx.ext.autodoc', 'sphinx.ext.napoleon',
-    'sphinx.ext.intersphinx']
+              'sphinx.ext.intersphinx']
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -70,8 +71,8 @@ html_theme_options = {
         "color-foreground-muted": "#818d86",  # for muted text
         "color-foreground-border": "#666666",  # for content borders
 
-#        "color-background-primary": "#2a2c2a",  # for content
-#        "color-background-secondary": "#222522",  # for navigation + ToC
+        #        "color-background-primary": "#2a2c2a",  # for content
+        #        "color-background-secondary": "#222522",  # for navigation + ToC
         "color-background-primary": "#222522",  # for content
         "color-background-secondary": "#2a2c2a",  # for navigation + ToC
         "color-background-hover": "#1e2421ff",  # for navigation-item hover
