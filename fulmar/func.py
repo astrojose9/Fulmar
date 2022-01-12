@@ -941,7 +941,7 @@ def params_optimizer(timeseries, period_guess, t0_guess, depth_guess, ab, r_star
                        "ror",
                        'dur',
                        'b',
-                       #                     "u",
+                       "u",
                        "mean"
                    ],)
 
