@@ -330,7 +330,7 @@ def read_lc_from_file(
             try:
                 t_1 = Table(t_1, names=colnames)
             except ValueError:
-                warnings.warn('number of items in colnames should match ' +
+                warnings.warn('number of items in colnames should match '
                               'the number of columns in the data',
                               FulmarWarning)
 
@@ -570,13 +570,13 @@ def fbn(timeseries, period, epoch0, duration=3 * u.h, nbin=40):
         The folded binned time series with an extra column 'phase_norm'.
 
     """
-    if isinstance(period, float):
+    if isinstance(period, (int, float)):
         period = period * u.d
 
-    if isinstance(epoch0, float):
+    if isinstance(epoch0, (int, float)):
         epoch0 = Time(epoch0, format=timeseries.time.format)
 
-    if isinstance(duration, float):
+    if isinstance(duration, (int, float)):
         duration = duration * u.d
 
     ts_fold = timeseries.fold(period=period,
@@ -588,15 +588,14 @@ def fbn(timeseries, period, epoch0, duration=3 * u.h, nbin=40):
     # ts_fold_bin = aggregate_downsample(ts_fold, time_bin_size=duration.to(
     #     period.unit) * period / nbin)
     ts_fold_bin = ts_binner(ts_fold, duration.to(
-        period.unit) * period / nbin)
+        period.unit) / nbin)
     # Normalize the phase
 
-    ts_fold['phase_norm'] = ts_fold.time / (period)
+    ts_fold['phase_norm'] = ts_fold.time / period
     # ts_fold['phase_norm'][
     #     ts_fold['phase_norm'].value <
     #     -0.3] += 1 * ts_fold['phase_norm'].unit  # For the occultation
-    ts_fold_bin['phase_norm'] = ts_fold_bin['time_bin_center'] / \
-        (period)
+    ts_fold_bin['phase_norm'] = ts_fold_bin.time / period
     # ts_fold_bin['phase_norm'][
     #     ts_fold_bin['phase_norm'].value <
     #     -0.3] += 1 * ts_fold_bin['phase_norm'].unit  # For the occultation
@@ -640,9 +639,9 @@ def GP_fit(time, flux, flux_err=None, mode='rotation',
 
     Returns
     -------
-    trace:
+    trace: `arviz.data.inference_data.InferenceData`
 
-    flat_samps :
+    flat_samps : `xarray.core.dataset.Dataset`
 
     """
 
@@ -679,8 +678,6 @@ def GP_fit(time, flux, flux_err=None, mode='rotation',
     else:
         time, flux, flux_err = cleaned_array(time, flux, flux_err)
 
-    time, flux, flux_err = cleaned_array(time, flux, flux_err)
-
     # flux should be centered around 0 for the GP
     if np.median(flux) > 0.5:
         flux = flux - 1
@@ -692,6 +689,16 @@ def GP_fit(time, flux, flux_err=None, mode='rotation',
         peak = ls["peaks"][0]
         per = peak["period"]
 
+    # flux and flux_err in ppt/ppm for numerical stability
+    factor = 1
+    if np.log(np.mean(flux_err)) < 0:  # ppt
+        factor = factor * 1e3
+        if np.log(np.mean(flux_err * factor)) < 0:  # ppm
+            factor = factor * 1e3
+
+    work_flux = flux * factor
+    work_flux_err = flux_err * factor
+
     # Initialize the GP model
     import pymc3 as pm
     import pymc3_ext as pmx
@@ -701,25 +708,25 @@ def GP_fit(time, flux, flux_err=None, mode='rotation',
     with pm.Model() as model:
 
         # The mean flux of the time series
-        mean = pm.Normal("mean", mu=0.0, sd=10.0)
+        mean = pm.Normal("mean", mu=0.0, sigma=10.0)
 
         # A jitter term describing excess white noise
         log_jitter = pm.Normal(
-            "log_jitter", mu=np.log(np.mean(flux_err)), sd=2.0)
+            "log_jitter", mu=np.log(np.mean(work_flux_err)), sigma=2.0)
 
         # A term to describe the non-periodic variability
         sigma = pm.InverseGamma(
             "sigma", **pmx.estimate_inverse_gamma_parameters(1.0, 5.0)
         )
         rho = pm.InverseGamma(
-            "rho", **pmx.estimate_inverse_gamma_parameters(0.5, 3.0)
+            "rho", **pmx.estimate_inverse_gamma_parameters(0.5, 2.0)
         )
 
         # The parameters of the RotationTerm kernel
         sigma_rot = pm.InverseGamma(
             "sigma_rot", **pmx.estimate_inverse_gamma_parameters(1.0, 5.0)
         )
-        log_period = pm.Normal("log_period", mu=np.log(per), sd=3.0)
+        log_period = pm.Normal("log_period", mu=np.log(per), sigma=2.0)
         period = pm.Deterministic("period", tt.exp(log_period))
         log_Q0 = pm.HalfNormal("log_Q0", sd=2.0)
         log_dQ = pm.Normal("log_dQ", mu=0.0, sd=2.0)
@@ -737,17 +744,17 @@ def GP_fit(time, flux, flux_err=None, mode='rotation',
         gp = GaussianProcess(
             kernel,
             t=time,
-            diag=flux_err ** 2 + tt.exp(2 * log_jitter),
+            diag=work_flux_err ** 2 + tt.exp(2 * log_jitter),
             mean=mean,
             quiet=True,
         )
 
         # Compute the Gaussian Process likelihood and add it into the
         # the PyMC3 model as a "potential"
-        gp.marginal("gp", observed=flux)
+        gp.marginal("gp", observed=work_flux)
 
         # Compute the mean model prediction for plotting purposes
-        pm.Deterministic("pred", gp.predict(flux))
+        pred = pm.Deterministic("pred", gp.predict(work_flux))
 
         # Optimize to find the maximum a posteriori parameters
         map_soln = pmx.optimize()
@@ -762,7 +769,7 @@ def GP_fit(time, flux, flux_err=None, mode='rotation',
     # _ = plt.title(target_TOI+" map model")
 
     # Sampling the model
-    np.random.seed()
+    np.random.seed(26)
     with model:
         trace = pmx.sample(
             tune=tune,
@@ -791,6 +798,8 @@ def GP_fit(time, flux, flux_err=None, mode='rotation',
     )
 
     flat_samps = trace.posterior.stack(sample=("chain", "draw"))
+    flat_samps['pred'].values = 1 + (flat_samps["pred"].values - np.mean(
+                                     flat_samps["pred"].values)) / factor
     return trace, flat_samps
 
 
@@ -1033,7 +1042,7 @@ def estimate_planet_mass(
             rho_p = dens_dic[rho_p.lower()]
         else:
             raise ValueError(
-                'Accepted str values for rho_p are "Earth" and "Neptune.')
+                'Accepted str values for rho_p are "Earth" and "Neptune".')
     else:
         raise TypeError(
             'rho_p should be `astropy.units.Quantity`, float or str.')
@@ -1062,9 +1071,9 @@ def estimate_semi_amplitude(
         Stellar mass (defaults to units of solar masses)
     M_planet : `~astropy.units.Quantity` or float
         Mass of the exolanet. (defaults to units of Earth masses)
-    R_p : `~astropy.units.Quantity` or float
+    R_planet : `~astropy.units.Quantity` or float
         Radius of the exolanet. (defaults to units of Earth radii)
-    rho_p : `~astropy.units.Quantity`, float or str
+    rho_planet : `~astropy.units.Quantity`, float or str
         Density of the exoplanet in kg * m^-3. Can be "Earth" or "Neptune".
     inc : `~astropy.units.Quantity` or float
         Orbital inclination (in degrees). Default: 90.
@@ -1080,23 +1089,24 @@ def estimate_semi_amplitude(
         period = period * u.d
     elif not isinstance(period, u.Quantity):
         raise TypeError(
-            'shoud be ```astropy.units.Quantity` or float')
+            'period shoud be `astropy.units.Quantity` or float')
 
     if isinstance(M_star, (int, float)):
         M_star = M_star * u.solMass
     elif not isinstance(M_star, u.Quantity):
         raise TypeError(
-            'shoud be ```astropy.units.Quantity` or float')
+            'M_star shoud be `astropy.units.Quantity` or float')
 
     if isinstance(inc, (int, float)):
         inc = inc * u.deg
     elif not isinstance(inc, u.Quantity):
         raise TypeError(
-            'shoud be ```astropy.units.Quantity` or float')
+            'inc shoud be `astropy.units.Quantity` or float')
 
     if M_planet is None:
+
         if R_planet is None or rho_planet is None:
-            raise ValueError('R_planet and rho_planet are both required ' +
+            raise ValueError('R_planet and rho_planet are both required '
                              'when M_planet is not given')
         else:
             M_planet = estimate_planet_mass(R_planet, rho_planet)
@@ -1117,10 +1127,81 @@ def estimate_semi_amplitude(
     M_p_jovian = M_planet.to(u.jupiterMass).value
     M_tot_solar = (M_star + M_planet).to(u.solMass).value
 
-    # Formula (14) from Lovis & Fischer 2010
+    # Equation (14) from Lovis & Fischer 2010
     K = 28.4329 * (u.m / u.s) * \
         M_p_jovian * \
         np.sin(inc) * np.power(M_tot_solar, -2 / 3) * \
         np.power(period.to(u.year).value, -1 / 3) / np.sqrt(1 - ecc)
 
     return K
+
+
+def perioplot(tls_results, target, folder, pl_n, maxper=None, savefig=False):
+    """
+    Plots the TLS periodgram.
+
+    Parameters
+    ----------
+    tls_results : `transitleastsquaresresults`
+        Results from a TLS search
+    target : str
+        Name of the target as a string, e.g. "TOI-175"
+    folder : str
+        Path to the folder in which the figure can be saved
+    pl_n : int or str
+        ID of the considered signal, e.g. "b". For the filename.
+    maxper : float, optional
+        Maximum period to be plotted. Default is None
+    savefig : bool, optional
+        If True, the plot is saved on the disk. Default is False.
+    """
+    if maxper is None:
+        maxper = np.max(tls_results.periods)
+    plt.figure()
+    ax = plt.gca()
+    ax.axvline(tls_results.period, alpha=0.4, lw=3, color='xkcd:green')
+    plt.xlim(np.min(tls_results.periods), maxper)
+    for n in range(2, 20):
+        ax.axvline(n * tls_results.period, alpha=0.4, lw=1,
+                   linestyle="dashed", color='xkcd:green')
+    for n in range(2, int(tls_results.period / min(tls_results.periods))):
+        ax.axvline(tls_results.period / n, alpha=0.4, lw=1,
+                   linestyle="dashed", color='xkcd:green')
+    plt.ylabel(r'SDE')
+    plt.title(target)
+    plt.xlabel('Period (days)')
+    plt.annotate("SDE = {0:.2f}, best period = {1:.5f} days".format(
+                 tls_results.SDE, tls_results.period),
+                 (.02, .02),
+                 xycoords="axes fraction",
+                 fontsize=12)
+    ax.plot(tls_results.periods, tls_results.power, color='black', lw=0.5)
+    plt.xlim(0, maxper)
+    plt.tight_layout()
+    if savefig is True:
+        plt.savefig(
+            folder + 'tls_periodogram_{n}_{Pmax}_days'.format(n=str(pl_n),
+            Pmax=int(maxper)), facecolor='white', dpi=240)
+    plt.show()
+
+
+def modelplot(tls_results, xlim=(0.48, 0.52)):
+    """
+    Plots the transit model and the lightcurve for visualization purposes.
+
+    Parameters
+    ----------
+    tls_results : `transitleastsquaresresults`
+        Results from a TLS search
+    xlim : tuple, optional
+        xlimits for the plot
+    """
+    plt.figure()
+    plt.plot(tls_results.model_folded_phase,
+             tls_results.model_folded_model, color='xkcd:green')
+    plt.scatter(tls_results.folded_phase, tls_results.folded_y,
+                color='black', s=10, alpha=0.4, zorder=2)
+    plt.xlim(xlim[0], xlim[1])
+    plt.xlabel('Phase')
+    plt.ylabel('Relative flux')
+    plt.show()

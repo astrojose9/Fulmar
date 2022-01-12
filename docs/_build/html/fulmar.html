@@ -355,6 +355,19 @@ passed as the numerical identifier of the input catalog.</p>
 </dl>
 </dd></dl>
 <dl class="py function">
+<dt class="sig sig-object py" id="fulmar.func.modelplot">
+<span class="sig-name descname"><span class="pre">modelplot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tls_results</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xlim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(0.48,</span> <span class="pre">0.52)</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fulmar.func.modelplot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plots the transit model and the lightcurve for visualization purposes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>tls_results</strong> (<cite>transitleastsquaresresults</cite>) – Results from a TLS search</p></li>
+<li><p><strong>xlim</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.10)"><em>tuple</em></a><em>, </em><em>optional</em>) – xlimits for the plot</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py function">
 <dt class="sig sig-object py" id="fulmar.func.normalize_lc">
 <span class="sig-name descname"><span class="pre">normalize_lc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lc_in</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'unscaled'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fulmar.func.normalize_lc" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a normalized version of the light curve using robust stats.</p>
@@ -383,6 +396,23 @@ from zero.</p>
 <dt class="sig sig-object py" id="fulmar.func.params_optimizer">
 <span class="sig-name descname"><span class="pre">params_optimizer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">timeseries</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">period_guess</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t0_guess</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">depth_guess</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ab</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">r_star</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tran_window</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.25</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ncores</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fulmar.func.params_optimizer" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="fulmar.func.perioplot">
+<span class="sig-name descname"><span class="pre">perioplot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tls_results</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">folder</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pl_n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maxper</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">savefig</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fulmar.func.perioplot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plots the TLS periodgram.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>tls_results</strong> (<cite>transitleastsquaresresults</cite>) – Results from a TLS search</p></li>
+<li><p><strong>target</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – Name of the target as a string, e.g. “TOI-175”</p></li>
+<li><p><strong>folder</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – Path to the folder in which the figure can be saved</p></li>
+<li><p><strong>pl_n</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – ID of the considered signal, e.g. “b”. For the filename.</p></li>
+<li><p><strong>maxper</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a><em>, </em><em>optional</em>) – Maximum period to be plotted. Default is None</p></li>
+<li><p><strong>savefig</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, the plot is saved on the disk. Default is False.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
 <dl class="py function">
 <dt class="sig sig-object py" id="fulmar.func.read_lc_from_file">
 <span class="sig-name descname"><span class="pre">read_lc_from_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">author</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exptime</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timeformat</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">colnames</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fulmar.func.read_lc_from_file" title="Permalink to this definition">¶</a></dt>

@@ -74,6 +74,8 @@ Functions
 .. autofunction:: fulmar.params_optimizer
 .. autofunction:: fulmar.estimate_planet_mass
 .. autofunction:: fulmar.estimate_semi_amplitude
+.. autofunction:: fulmar.perioplot
+.. autofunction:: fulmar.modelplot
 
 
 Time

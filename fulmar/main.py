@@ -38,7 +38,9 @@ from fulmar.func import (
     GP_fit,
     params_optimizer,
     estimate_planet_mass,
-    estimate_semi_amplitude
+    estimate_semi_amplitude,
+    perioplot,
+    modelplot
 )
 from fulmar.utils import (
     FulmarWarning,
@@ -668,7 +670,7 @@ class target:
         exptimes = self.ts_clean['exptime']
 
         if time_window is not None:
-            if isinstance(time_window, float):
+            if isinstance(time_window, (int, float)):
                 time_window = time_window * u.d
         else:
             if len(np.unique(exptimes)) > 1:
@@ -729,7 +731,8 @@ class target:
 
             finflat = lc.flatten(window_length=wl, polyorder=polyorder,
                                  break_tolerance=break_tolerance, sigma=sigma,
-                                 return_trend=True, mask=clip.mask)
+                                 return_trend=True,
+                                 mask=np.logical_or(mask[mask_exp], clip.mask))
 
             # clc1 = finflat[0]
             # trend_ts = TimeSeries(finflat[1])
@@ -750,7 +753,9 @@ class target:
                               FulmarWarning)
 
         cleaned_lc = clean_col.stitch()
+        cleaned_lc.sort('time')
         trend_ts = TimeSeries(trend_col.stitch())
+        trend_ts.sort('time')
 
         flux_filtered = cleaned_lc.flux
 
@@ -765,7 +770,6 @@ class target:
             trend_ts = trend_ts[out_mask]
 
         if return_trend is True:
-            trend_ts = trend_ts[out_mask]
 
             return self.ts_clean, trend_ts
 
@@ -786,7 +790,7 @@ class target:
             remove_outliers=True,
             sigma_out=3,
             mask=None,
-            store_trace=False):
+            store_trace=True):
         """Corrects the stellar rotation using GP
 
         Parameters
@@ -845,14 +849,20 @@ class target:
             bin_duration = bin_duration * u.d
 
         # binning
-        if mask is not None:
-            self.ts_binned = ts_binner(self.ts_clean[mask], bin_duration)
-        else:
-            self.ts_binned = ts_binner(self.ts_clean, bin_duration)
+        if bin_duration is not None:
+            if mask is not None:
+                self.ts_binned = ts_binner(self.ts_clean[~mask], bin_duration)
+            else:
+                self.ts_binned = ts_binner(self.ts_clean, bin_duration)
 
-        t_bin = self.ts_binned.time.value
-        y_bin = self.ts_binned[self.flux_kw].value
-        y_err_bin = self.ts_binned[self.flux_err_kw].value
+            t_bin = self.ts_binned.time.value
+            y_bin = self.ts_binned[self.flux_kw].value
+            y_err_bin = self.ts_binned[self.flux_err_kw].value
+        else:
+            if mask is not None:
+                t_bin, y_bin, y_err_bin = time_flux_err(self.ts_clean[mask])
+            else:
+                t_bin, y_bin, y_err_bin = time_flux_err(self.ts_clean)
         # print(y_err_bin)
 
         # Case 1: flux_err only contains NaNs (common with EVEREST)
@@ -881,14 +891,15 @@ class target:
 
         # GP_fit
         trace, flat_samps = GP_fit(
-            t_bin, y_bin, y_err_bin, per=peak['period'], ncores=ncores)
+            t_bin, y_bin, y_err_bin, tune=tune, draws=draws, chains=chains,
+            target_accept=target_accept, per=peak['period'], ncores=ncores)
 
         if store_trace is True:
             self.activity_gp_trace = trace
         gp_mod = np.median(flat_samps["pred"].values, axis=1)
 
         # interpolate the model to the data, as it is currently binned
-        gp_int = np.interp(time, t_bin, gp_mod + 1)
+        gp_int = np.interp(time, t_bin, gp_mod)
         flux_filtered = flux / gp_int
 
         self.ts_clean[self.flux_kw] = flux_filtered
@@ -910,7 +921,8 @@ class target:
         return self.ts_clean
 
     def plot_transitcheck(self, period, epoch0, duration=3 * u.h, nbin=40,
-                          timeseries=None, savefig=False, fig_id=None):
+                          timeseries=None, savefig=False, folder=None,
+                          fig_id=None):
         """
         Plots a transitcheck image. A visual check at a given period and epoch
         useful to probe signals detected in RV.
@@ -929,16 +941,24 @@ class target:
             TimeSeries object
         savefig : bool
             If True, saves the resulting figure on the disk.
+        folder : str
+            Path to the folder in which the figure can be saved
         fig_id : str or int
             Suffix for the filename when the figure is exported.
 
         """
+        if isinstance(period, (int, float)):
+            period = period * u.d
+
+        if isinstance(duration, (int, float)):
+            duration = duration * u.d
+
         if timeseries is not None:
             ts_fold, ts_fold_bin = fbn(
-                timeseries, period, epoch0, duration)
+                timeseries, period, epoch0, duration, nbin)
         else:
             ts_fold, ts_fold_bin = fbn(
-                self.ts_stitch, period, epoch0, duration)
+                self.ts_stitch, period, epoch0, duration, nbin)
 
         # Wrap the phase for the occultation
         ts_fold['phase_norm'][
@@ -948,6 +968,7 @@ class target:
         ts_fold_bin['phase_norm'][ts_fold_bin['phase_norm'].value <
                                   -0.3] += 1 * ts_fold_bin['phase_norm'].unit
 
+        dur_phase = (duration.to(period.unit) / period).value
         # For the occultation
 
         # Plots the graphs
@@ -957,7 +978,7 @@ class target:
         ax1 = fig.add_subplot(gs[0:, :-1])
         ax1.plot(ts_fold['phase_norm'].value,
                  ts_fold[self.flux_kw],
-                 '.k',
+                 'k',
                  alpha=0.25,
                  # color='xkcd:charcoal',
                  marker='.',
@@ -990,7 +1011,7 @@ class target:
                  marker='.',
                  linestyle='None',
                  ms=1.6)
-        ax2.set_xlim(-2 * duration, 2 * duration)
+        ax2.set_xlim(-2 * dur_phase, 2 * dur_phase)
         # ax2.set_xlim(-0.1,0.1)
         ax2.get_yaxis().get_major_formatter().set_useOffset(False)
         ax2.set_ylabel('Flux')
@@ -1003,16 +1024,18 @@ class target:
                  marker='.',
                  linestyle='None',
                  ms=1.6)
-        ax3.set_xlim(0.5 - 2 * duration, 0.5 + 2 * duration)
+        ax3.set_xlim(0.5 - 2 * dur_phase, 0.5 + 2 * dur_phase)
         # ax3.set_xlim(0.4,0.6)
         ax3.get_yaxis().get_major_formatter().set_useOffset(False)
         ax3.set_xlabel('Phase')
         ax3.set_ylabel('Flux')
         ax3.set_title('Occultation')
+        if folder is None:
+            folder = self.lc_folder
         if savefig is True:
             if fig_id is None:
                 fig_id = 1
-            plt.savefig(self.lc_folder + 'transitcheck' + str(fig_id),
+            plt.savefig(folder + 'transitcheck' + str(fig_id),
                         facecolor='white', dpi=240)
         plt.show()
         plt.close()
@@ -1072,19 +1095,18 @@ class target:
                 # y_err = np.array(
                 #     self.ts_stitch[self.flux_err_kw], dtype=np.float64)
 
-        else:
-            if mask is not None:
-                t, y, y_err = time_flux_err(
-                    timeseries,
-                    flux_kw=self.flux_kw,
-                    flux_err_kw=self.flux_err_kw)
+        if mask is None:
+            t, y, y_err = time_flux_err(
+                timeseries,
+                flux_kw=self.flux_kw,
+                flux_err_kw=self.flux_err_kw)
 
-            else:  # intransit = True
-                t, y, y_err = time_flux_err(
-                    timeseries[~mask],
-                    flux_kw=self.flux_kw,
-                    flux_err_kw=self.flux_err_kw)
-            # t = timeseries.time.value
+        else:  # intransit = True
+            t, y, y_err = time_flux_err(
+                timeseries[~mask],
+                flux_kw=self.flux_kw,
+                flux_err_kw=self.flux_err_kw)
+        # t = timeseries.time.value
             # y = np.array(timeseries[self.flux_kw], dtype=np.float64)
             # y_err = np.array(timeseries[self.flux_err_kw], dtype=np.float64)
 
