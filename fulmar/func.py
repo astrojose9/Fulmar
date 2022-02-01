@@ -26,6 +26,8 @@ from fulmar.utils import (
     FulmarError,
     FulmarWarning,
     print_version,
+)
+from fulmar.time import (
     rjd_to_astropy_time
 )
 
@@ -798,8 +800,16 @@ def GP_fit(time, flux, flux_err=None, mode='rotation',
     )
 
     flat_samps = trace.posterior.stack(sample=("chain", "draw"))
-    flat_samps['pred'].values = 1 + (flat_samps["pred"].values - np.mean(
-                                     flat_samps["pred"].values)) / factor
+#    flat_samps['pred'].values = flat_samps["pred"].values / factor
+
+    # Sometimes it messes up for an unknown reason. Factor correction here.
+    omag = np.floor(np.log10(
+        np.nanstd(flux) / np.nanstd(
+            np.median(flat_samps["pred"].values, axis=1))))
+    # Add 1 to the flux.
+    flat_samps['pred'].values = 1 + (flat_samps['pred'].values - np.median(
+        flat_samps["pred"].values)) * 10**omag
+
     return trace, flat_samps
 
 
@@ -814,7 +824,8 @@ def params_optimizer(timeseries, period_guess, t0_guess, depth_guess, ab, r_star
     if mask is not None:
         x, y, yerr = time_flux_err(timeseries[mask])
 
-    x, y, yerr = time_flux_err(timeseries)
+    else:
+        x, y, yerr = time_flux_err(timeseries)
 
     # x = time.copy()
     # y = flux.copy()
@@ -847,8 +858,8 @@ def params_optimizer(timeseries, period_guess, t0_guess, depth_guess, ab, r_star
 
         # Stellar parameters
         mean = pm.Normal("mean", mu=0.0, sigma=10.0)
-#         u = xo.distributions.QuadLimbDark("u", testval=np.array(ab))
-#         star_params = [mean, u]
+#        u = xo.distributions.QuadLimbDark("u", testval=np.array(ab))
+#        star_params = [mean, u]
         u = ab
         star_params = [mean]
 
@@ -858,6 +869,7 @@ def params_optimizer(timeseries, period_guess, t0_guess, depth_guess, ab, r_star
         )
         ror = pm.Deterministic("ror", tt.exp(log_ror))
         r_pl = pm.Deterministic("r_pl", ror * r_star)
+
         # Orbital parameters
         log_period = pm.Normal(
             "log_period", mu=np.log(period_guess), sigma=1.0)
@@ -941,7 +953,7 @@ def params_optimizer(timeseries, period_guess, t0_guess, depth_guess, ab, r_star
                        "ror",
                        'dur',
                        'b',
-                       "u",
+                       # "u",
                        "mean"
                    ],)
 
@@ -953,6 +965,8 @@ def params_optimizer(timeseries, period_guess, t0_guess, depth_guess, ab, r_star
 #         ab = tuple((np.median(flat_samps['u'], axis=-1)))
 
         # Plot the folded data
+        plt.rc('font', size=14)
+        plt.figure(figsize=(9, 6))
         x_fold = (x - t0 + 0.5 * p) % p - 0.5 * p
         plt.plot(x_fold, 1 + y, ".k", alpha=0.4, label="data", zorder=-1000)
 
@@ -962,7 +976,8 @@ def params_optimizer(timeseries, period_guess, t0_guess, depth_guess, ab, r_star
         num, _ = np.histogram(x_fold, bins, weights=y)
         denom[num == 0] = 1.0
         plt.plot(
-            0.5 * (bins[1:] + bins[:-1]), 1 + num / denom, "o", color="C1", label="binned", alpha=0.7
+            0.5 * (bins[1:] + bins[:-1]), 1 + num / denom, "o", color="C1",
+            label="binned", alpha=0.7
         )
 
         # Plot the folded model
@@ -971,9 +986,13 @@ def params_optimizer(timeseries, period_guess, t0_guess, depth_guess, ab, r_star
         pred = np.percentile(
             flat_samps["light_curves"][inds, 0], [16, 50, 84], axis=-1
         )
-        plt.plot(x_fold[inds], 1 + pred[1], color="xkcd:green", label="model")
+        plt.plot(x_fold[inds], 1 + np.median(flat_samps['mean']) + pred[1],
+                 color="xkcd:green", label="model")
         art = plt.fill_between(
-            x_fold[inds], 1 + pred[0], 1 + pred[2], color="xkcd:green", alpha=0.2, zorder=1000
+            x_fold[inds], 1 + np.median(flat_samps['mean']) + pred[0],
+            1 + np.median(flat_samps['mean']) + pred[2],
+            color="xkcd:green",
+            alpha=0.2, zorder=1000
         )
         art.set_edgecolor("none")
 
@@ -1002,138 +1021,6 @@ def params_optimizer(timeseries, period_guess, t0_guess, depth_guess, ab, r_star
         plt.show()
 
         return p, t0, dur, depth, ab, flat_samps
-
-
-def estimate_planet_mass(
-        R_p,
-        rho_p):
-    """
-    Estimates the mass of an exoplanet from its radius and density.
-
-    Parameters
-    ----------
-    R_p : `~astropy.units.Quantity` or float
-        Radius of the exolanet. (defaults to units of Earth radii)
-    rho_p : `~astropy.units.Quantity`, float or str
-        Density of the exoplanet in kg * m^-3. Can be "Earth" or "Neptune".
-
-    Returns
-    -------
-    M_planet : `~astropy.units.Quantity`
-        Estimated mass of the exoplanet.
-    """
-    dens_dic = {'earth': 5514 * (u.kg / u.m**3),
-                'neptune': 1638 * (u.kg / u.m**3)}
-
-    if isinstance(R_p, (int, float)):
-        R_p = R_p * u.earthRad
-
-    elif isinstance(R_p, u.Quantity):
-        R_p = R_p.to(u.earthRad)
-
-    else:
-        raise TypeError('R_p should be `astropy.units.Quantity` or float')
-
-    if isinstance(rho_p, (int, float)):
-        rho_p = rho_p * (u.kg / u.m**3)
-
-    elif isinstance(rho_p, str):
-        if rho_p.lower() in dens_dic.keys():
-            rho_p = dens_dic[rho_p.lower()]
-        else:
-            raise ValueError(
-                'Accepted str values for rho_p are "Earth" and "Neptune".')
-    else:
-        raise TypeError(
-            'rho_p should be `astropy.units.Quantity`, float or str.')
-
-    M_planet = (R_p.value ** 3 * rho_p / dens_dic['earth']) * u.earthMass
-    return M_planet
-
-
-def estimate_semi_amplitude(
-        period,
-        M_star,
-        M_planet=None,
-        R_planet=None,
-        rho_planet=None,
-        inc=90 * u.deg,
-        ecc=0):
-    """
-    Estimates the radial velocity semi-amplitude corresponding to a planet of
-    given parameters.
-
-    Parameters
-    ----------
-    period : `~astropy.units.Quantity` or float
-        The period to use for folding. (defaults to units of days)
-    M_star : `~astropy.units.Quantity` or float
-        Stellar mass (defaults to units of solar masses)
-    M_planet : `~astropy.units.Quantity` or float
-        Mass of the exolanet. (defaults to units of Earth masses)
-    R_planet : `~astropy.units.Quantity` or float
-        Radius of the exolanet. (defaults to units of Earth radii)
-    rho_planet : `~astropy.units.Quantity`, float or str
-        Density of the exoplanet in kg * m^-3. Can be "Earth" or "Neptune".
-    inc : `~astropy.units.Quantity` or float
-        Orbital inclination (in degrees). Default: 90.
-    ecc : float
-        Orbital eccentricity. Default: 0.
-
-    Returns
-    -------
-    K : `~astropy.units.Quantity`
-        Estimated semi-amplitude of the RV.
-    """
-    if isinstance(period, (int, float)):
-        period = period * u.d
-    elif not isinstance(period, u.Quantity):
-        raise TypeError(
-            'period shoud be `astropy.units.Quantity` or float')
-
-    if isinstance(M_star, (int, float)):
-        M_star = M_star * u.solMass
-    elif not isinstance(M_star, u.Quantity):
-        raise TypeError(
-            'M_star shoud be `astropy.units.Quantity` or float')
-
-    if isinstance(inc, (int, float)):
-        inc = inc * u.deg
-    elif not isinstance(inc, u.Quantity):
-        raise TypeError(
-            'inc shoud be `astropy.units.Quantity` or float')
-
-    if M_planet is None:
-
-        if R_planet is None or rho_planet is None:
-            raise ValueError('R_planet and rho_planet are both required '
-                             'when M_planet is not given')
-        else:
-            M_planet = estimate_planet_mass(R_planet, rho_planet)
-    else:
-        if R_planet is not None or rho_planet is not None:
-            warnings.warn(
-                'M_planet overrides R_planet and rho_planet', FulmarWarning)
-
-        if isinstance(M_planet, (int, float)):
-            M_planet = M_planet * u.earthMass
-
-        elif not isinstance(M_planet, u.Quantity):
-            raise TypeError(
-                'M_planet should be `astropy.units.Quantity` or float')
-
-    inc = inc.to(u.deg)
-
-    M_p_jovian = M_planet.to(u.jupiterMass).value
-    M_tot_solar = (M_star + M_planet).to(u.solMass).value
-
-    # Equation (14) from Lovis & Fischer 2010
-    K = 28.4329 * (u.m / u.s) * \
-        M_p_jovian * \
-        np.sin(inc) * np.power(M_tot_solar, -2 / 3) * \
-        np.power(period.to(u.year).value, -1 / 3) / np.sqrt(1 - ecc)
-
-    return K
 
 
 def perioplot(tls_results, target, folder, pl_n, maxper=None, savefig=False):
@@ -1181,7 +1068,7 @@ def perioplot(tls_results, target, folder, pl_n, maxper=None, savefig=False):
     if savefig is True:
         plt.savefig(
             folder + 'tls_periodogram_{n}_{Pmax}_days'.format(n=str(pl_n),
-            Pmax=int(maxper)), facecolor='white', dpi=240)
+                                                              Pmax=int(maxper)), facecolor='white', dpi=240)
     plt.show()
 
 

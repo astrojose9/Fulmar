@@ -27,6 +27,10 @@ import warnings
 
 # FULMAR parts
 import fulmar.fulmar_constants as fulmar_constants
+from fulmar.estimators import(
+    estimate_planet_mass,
+    estimate_semi_amplitude
+)
 from fulmar.func import (
     mission_identifier,
     target_identifier,
@@ -37,15 +41,20 @@ from fulmar.func import (
     fbn,
     GP_fit,
     params_optimizer,
-    estimate_planet_mass,
-    estimate_semi_amplitude,
     perioplot,
     modelplot
+)
+from fulmar.query import (
+    teff_logg_TIC,
+    teff_logg_KIC,
+    teff_logg_EPIC
+)
+from fulmar.time import (
+    rjd_to_astropy_time
 )
 from fulmar.utils import (
     FulmarWarning,
     print_version,
-    rjd_to_astropy_time,
     warning_on_one_line
 )
 
@@ -87,6 +96,14 @@ class target:
     R_star_max : float
         1-sigma upper confidence interval on stellar radius
         (in units of solar radii)
+    Teff : float
+        Effective temperature
+    Teff_err : float
+        Error on `Teff`
+    logg : float
+        Spectroscopic surface gravity
+    logg_err : float
+        Error on `logg`
     flux_kw : str
         Keyword for the column containing the flux values
         (Default: 'flux')
@@ -161,27 +178,58 @@ class target:
                 targname, self.mission)
 
             # Stellar parameters from TIC
-            self.ab, self.M_star, self.M_star_min, self.M_star_max, self.R_star, self.R_star_min, self.R_star_max = catalog_info(
-                TIC_ID=self.TIC_num)
+
+            self.Teff, self.Teff_err, self.logg, self.logg_err = teff_logg_TIC(
+                self.TIC_num)
+
+            cinf = catalog_info(TIC_ID=self.TIC_num)
+
+#            self.ab, self.M_star, self.M_star_min, self.M_star_max, self.R_star, self.R_star_min, self.R_star_max = catalog_info(
+#                TIC_ID=self.TIC_num)
+
+
         elif self.mission == 'Kepler':
             # Kepler identifiers
             self.KIC, self.kep, self.KIC_num = target_identifier(
                 targname, self.mission)
 
             # Stellar parameters from KIC
-            self.ab, self.M_star, self.M_star_min, self.M_star_max, self.R_star, self.R_star_min, self.R_star_max = catalog_info(
-                KIC_ID=self.KIC_num)
+
+            self.Teff, self.Teff_err, self.logg, self.logg_err = teff_logg_KIC(
+                self.KIC_num)
+
+            cinf = catalog_info(KIC_ID=self.KIC_num)
+
+#            self.ab, self.M_star, self.M_star_min, self.M_star_max, self.R_star, self.R_star_min, self.R_star_max = catalog_info(
+#                KIC_ID=self.KIC_num)
+
         elif self.mission == 'K2':
             # K2 identifiers
             self.EPIC, self.K2, self.EPIC_num = target_identifier(
                 targname, self.mission)
 
             # Stellar parameters from EPIC
-            self.ab, self.M_star, self.M_star_min, self.M_star_max, self.R_star, self.R_star_min, self.R_star_max = catalog_info(
-                EPIC_ID=self.EPIC_num)
+
+            self.Teff, self.Teff_err, self.logg, self.logg_err = (
+                teff_logg_EPIC(self.EPIC_num)
+            )
+
+            cinf = catalog_info(EPIC_ID=self.EPIC_num)
+
+#            self.ab, self.M_star, self.M_star_min, self.M_star_max, self.R_star, self.R_star_min, self.R_star_max = catalog_info(
+#                EPIC_ID=self.EPIC_num)
+
         else:
             warnings.warn(self.mission, 'mission is not supported... yet(?)',
                           FulmarWarning)
+
+        self.ab = cinf[0]
+        self.M_star = float(cinf[1])
+        self.M_star_min = float(cinf[2])
+        self.M_star_max = float(cinf[3])
+        self.R_star = float(cinf[4])
+        self.R_star_min = float(cinf[5])
+        self.R_star_max = float(cinf[6])
 
         self.author = ('SPOC', 'TESS_SPOC', 'Kepler', 'K2', 'EVEREST')
 
@@ -191,7 +239,10 @@ class target:
 
         # Lightcurve folder
         if self.mission == 'TESS':
-            self.lc_folder = os.getcwd() + '/{}/'.format(self.TOI)
+            if self.TOI is not None:
+                self.lc_folder = os.getcwd() + '/{}/'.format(self.TOI)
+            else:
+                self.lc_folder = os.getcwd() + '/{}/'.format(self.TIC)
         elif self.mission == 'Kepler':
             self.lc_folder = os.getcwd() + '/{}/'.format(self.kep)
         elif self.mission == 'K2':
@@ -722,6 +773,7 @@ class target:
                              polyorder=polyorder,
                              break_tolerance=break_tolerance,
                              sigma=sigma,
+                             niters=niters,
                              mask=mask[mask_exp])
 
             flux_filtered1 = clc.flux
@@ -731,7 +783,7 @@ class target:
 
             finflat = lc.flatten(window_length=wl, polyorder=polyorder,
                                  break_tolerance=break_tolerance, sigma=sigma,
-                                 return_trend=True,
+                                 return_trend=True, niters=niters,
                                  mask=np.logical_or(mask[mask_exp], clip.mask))
 
             # clc1 = finflat[0]
