@@ -933,7 +933,7 @@ def params_optimizer(timeseries, period_guess, t0_guess, depth_guess, ab, r_star
 #         _ = plt.xlim(-tran_window, tran_window)
 #         plt.show()
 
-        np.random.seed()
+        np.random.seed(42)
         with model:
             trace = pmx.sample(
                 tune=2500,
