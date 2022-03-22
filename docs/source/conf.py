@@ -52,11 +52,20 @@ napoleon_numpy_docstring = True
 # html_theme = 'sphinx_rtd_theme'
 html_theme = 'furo'
 
+# Add any paths that contain custom static files (such as style sheets) here,
+# relative to this directory. They are copied after the builtin static files,
+# so a file named "default.css" will overwrite the builtin "default.css".
+html_static_path = ['_static']
+
+
 # html_logo = "FULMAR_logo_name.png"
 html_theme_options = {
 
     "light_logo": "FULMAR_logo_light_mode.png",
     "dark_logo": "FULMAR_logo_name.png",
+
+    'logo_only': True,
+    'display_version': False,
 
     "sidebar_hide_name": True,
     "light_css_variables": {
@@ -91,11 +100,6 @@ html_theme_options = {
         "color-problematic": "#51ee51",
     },
 }
-
-# Add any paths that contain custom static files (such as style sheets) here,
-# relative to this directory. They are copied after the builtin static files,
-# so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = ['.._build/html/_static']
 
 
 # intersphinx enables links to classes/functions in the packages defined here:
