@@ -1,6 +1,7 @@
 import astropy.units as u
 import numpy as np
 
+import warnings
 from fulmar.utils import (
     FulmarWarning
 )

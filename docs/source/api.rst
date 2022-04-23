@@ -20,10 +20,10 @@ Target object
    - **R_star** *(float)* Stellar radius (in units of solar radii)
    - **R_star_min** *(float)* – 1-sigma upper confidence interval on stellar radius (in units of solar radii)
    - **R_star_max** *(float)* – 1-sigma lower confidence interval on stellar radius (in units of solar radii)
-   - **Teff : *(float)* – Effective temperature
-   - **Teff_err : *(float)* – Error on `Teff`
-   - **logg : *(float)* – Spectroscopic surface gravity
-   - **logg_err : *(float)* – Error on `logg`
+   - **Teff** : *(float)* – Effective temperature
+   - **Teff_err** : *(float)* – Error on `Teff`
+   - **logg** : *(float)* – Spectroscopic surface gravity
+   - **logg_err** : *(float)* – Error on `logg`
    - **flux_kw** *(str)* – Keyword for the column containing the flux values
         (Default: 'flux')
    - **flux_err_kw** *(str)* – Keyword for the column containing the flux uncertainty values

@@ -4,10 +4,10 @@
    contain the root `toctree` directive.
 Welcome to the documentation for:
 
-.. image:: FULMAR_logo_title_light_mode.png
+.. image:: _images/FULMAR_logo_title_light_mode.png
    :class: only-light
 
-.. image:: FULMAR_logo_title_dark_mode.png
+.. image:: _images/FULMAR_logo_title_dark_mode.png
    :class: only-dark
 
 **FULMAR** is an open source Python package that was created to assist radial velocity follow-up programs by making the analysis of the light curves easier. It provides tools to correct stellar activity, to look for transits, to refine transit parameters, to estimate the amplitude of the corresponding RV signal, and to visually probe signals detected in RV.

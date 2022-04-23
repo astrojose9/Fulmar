@@ -251,6 +251,10 @@ as the numerical identifier of the input catalog.</p></li>
 <li><p><strong>R_star</strong> <em>(float)</em> Stellar radius (in units of solar radii)</p></li>
 <li><p><strong>R_star_min</strong> <em>(float)</em> – 1-sigma upper confidence interval on stellar radius (in units of solar radii)</p></li>
 <li><p><strong>R_star_max</strong> <em>(float)</em> – 1-sigma lower confidence interval on stellar radius (in units of solar radii)</p></li>
+<li><p><a href="#id1"><span class="problematic" id="id2">**</span></a>Teff : <em>(float)</em> – Effective temperature</p></li>
+<li><p><a href="#id3"><span class="problematic" id="id4">**</span></a>Teff_err : <em>(float)</em> – Error on <cite>Teff</cite></p></li>
+<li><p><a href="#id5"><span class="problematic" id="id6">**</span></a>logg : <em>(float)</em> – Spectroscopic surface gravity</p></li>
+<li><p><a href="#id7"><span class="problematic" id="id8">**</span></a>logg_err : <em>(float)</em> – Error on <cite>logg</cite></p></li>
 <li><dl class="simple">
 <dt><strong>flux_kw</strong> <em>(str)</em> – Keyword for the column containing the flux values</dt><dd><p>(Default: ‘flux’)</p>
 </dd>
@@ -455,7 +459,7 @@ the flux.</p></li>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="fulmar.fulmar.target.target.clean_subt_activity_GP">
-<span class="sig-prename descclassname"><span class="pre">target.</span></span><span class="sig-name descname"><span class="pre">clean_subt_activity_GP</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">timeseries=None</span></em>, <em class="sig-param"><span class="pre">bin_duration=&lt;Quantity</span> <span class="pre">40.</span> <span class="pre">min&gt;</span></em>, <em class="sig-param"><span class="pre">period_min=0.2</span></em>, <em class="sig-param"><span class="pre">period_max=100.0</span></em>, <em class="sig-param"><span class="pre">tune=2500</span></em>, <em class="sig-param"><span class="pre">draws=2500</span></em>, <em class="sig-param"><span class="pre">chains=2</span></em>, <em class="sig-param"><span class="pre">target_accept=0.95</span></em>, <em class="sig-param"><span class="pre">ncores=None</span></em>, <em class="sig-param"><span class="pre">return_trend=False</span></em>, <em class="sig-param"><span class="pre">remove_outliers=True</span></em>, <em class="sig-param"><span class="pre">sigma_out=3</span></em>, <em class="sig-param"><span class="pre">mask=None</span></em>, <em class="sig-param"><span class="pre">store_trace=False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#fulmar.fulmar.target.target.clean_subt_activity_GP" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">target.</span></span><span class="sig-name descname"><span class="pre">clean_subt_activity_GP</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">timeseries=None</span></em>, <em class="sig-param"><span class="pre">bin_duration=&lt;Quantity</span> <span class="pre">40.</span> <span class="pre">min&gt;</span></em>, <em class="sig-param"><span class="pre">period_min=0.2</span></em>, <em class="sig-param"><span class="pre">period_max=100.0</span></em>, <em class="sig-param"><span class="pre">tune=2500</span></em>, <em class="sig-param"><span class="pre">draws=2500</span></em>, <em class="sig-param"><span class="pre">chains=2</span></em>, <em class="sig-param"><span class="pre">target_accept=0.95</span></em>, <em class="sig-param"><span class="pre">ncores=None</span></em>, <em class="sig-param"><span class="pre">return_trend=False</span></em>, <em class="sig-param"><span class="pre">remove_outliers=True</span></em>, <em class="sig-param"><span class="pre">sigma_out=3</span></em>, <em class="sig-param"><span class="pre">mask=None</span></em>, <em class="sig-param"><span class="pre">store_trace=True</span></em><span class="sig-paren">)</span><a class="headerlink" href="#fulmar.fulmar.target.target.clean_subt_activity_GP" title="Permalink to this definition">¶</a></dt>
 <dd><p>Corrects the stellar rotation using GP</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -493,7 +497,7 @@ the flux.</p></li>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="fulmar.fulmar.target.target.plot_transitcheck">
-<span class="sig-prename descclassname"><span class="pre">target.</span></span><span class="sig-name descname"><span class="pre">plot_transitcheck</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">period</span></em>, <em class="sig-param"><span class="pre">epoch0</span></em>, <em class="sig-param"><span class="pre">duration=&lt;Quantity</span> <span class="pre">3.</span> <span class="pre">h&gt;</span></em>, <em class="sig-param"><span class="pre">nbin=40</span></em>, <em class="sig-param"><span class="pre">timeseries=None</span></em>, <em class="sig-param"><span class="pre">savefig=False</span></em>, <em class="sig-param"><span class="pre">fig_id=None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#fulmar.fulmar.target.target.plot_transitcheck" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">target.</span></span><span class="sig-name descname"><span class="pre">plot_transitcheck</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">period</span></em>, <em class="sig-param"><span class="pre">epoch0</span></em>, <em class="sig-param"><span class="pre">duration=&lt;Quantity</span> <span class="pre">3.</span> <span class="pre">h&gt;</span></em>, <em class="sig-param"><span class="pre">nbin=40</span></em>, <em class="sig-param"><span class="pre">timeseries=None</span></em>, <em class="sig-param"><span class="pre">savefig=False</span></em>, <em class="sig-param"><span class="pre">folder=None</span></em>, <em class="sig-param"><span class="pre">fig_id=None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#fulmar.fulmar.target.target.plot_transitcheck" title="Permalink to this definition">¶</a></dt>
 <dd><p>Plots a transitcheck image. A visual check at a given period and epoch
 useful to probe signals detected in RV.</p>
 <dl class="field-list simple">
@@ -505,6 +509,7 @@ useful to probe signals detected in RV.</p>
 <li><p><strong>nbin</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a>) – Number of bins in the transit window.</p></li>
 <li><p><strong>timeseries</strong> (<cite>~astropy.timeseries.TimeSeries</cite>, optional) – TimeSeries object</p></li>
 <li><p><strong>savefig</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a>) – If True, saves the resulting figure on the disk.</p></li>
+<li><p><strong>folder</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – Path to the folder in which the figure can be saved</p></li>
 <li><p><strong>fig_id</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a>) – Suffix for the filename when the figure is exported.</p></li>
 </ul>
 </dd>
@@ -681,7 +686,7 @@ if replace_nan_err=False, returns an array filled with Nans.</p></li>
 <dt class="sig sig-object py" id="fulmar.ts_binner">
 <span class="sig-name descname"><span class="pre">ts_binner</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">timeseries</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bin_duration</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fulmar.ts_binner" title="Permalink to this definition">¶</a></dt>
 <dd><p>Wrap around for astropy’s aggregate_downsample returning a
-<a href="#id1"><span class="problematic" id="id2">`</span></a>~astropy.timeseries.TimeSeries`object with Time at the center of the bins.</p>
+<a href="#id9"><span class="problematic" id="id10">`</span></a>~astropy.timeseries.TimeSeries`object with Time at the center of the bins.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -746,8 +751,8 @@ Defaults to np.std(flux)</p></li>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p><ul class="simple">
-<li><p><em>trace</em></p></li>
-<li><p><em>flat_samps</em></p></li>
+<li><p><strong>trace</strong> (<cite>arviz.data.inference_data.InferenceData</cite>)</p></li>
+<li><p><strong>flat_samps</strong> (<cite>xarray.core.dataset.Dataset</cite>)</p></li>
 </ul>
 </p>
 </dd>
@@ -757,6 +762,39 @@ Defaults to np.std(flux)</p></li>
 <dt class="sig sig-object py" id="fulmar.params_optimizer">
 <span class="sig-name descname"><span class="pre">params_optimizer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">timeseries</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">period_guess</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t0_guess</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">depth_guess</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ab</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">r_star</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tran_window</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.25</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ncores</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fulmar.params_optimizer" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="fulmar.perioplot">
+<span class="sig-name descname"><span class="pre">perioplot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tls_results</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">folder</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pl_n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maxper</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">savefig</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fulmar.perioplot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plots the TLS periodgram.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>tls_results</strong> (<cite>transitleastsquaresresults</cite>) – Results from a TLS search</p></li>
+<li><p><strong>target</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – Name of the target as a string, e.g. “TOI-175”</p></li>
+<li><p><strong>folder</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – Path to the folder in which the figure can be saved</p></li>
+<li><p><strong>pl_n</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – ID of the considered signal, e.g. “b”. For the filename.</p></li>
+<li><p><strong>maxper</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a><em>, </em><em>optional</em>) – Maximum period to be plotted. Default is None</p></li>
+<li><p><strong>savefig</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, the plot is saved on the disk. Default is False.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="fulmar.modelplot">
+<span class="sig-name descname"><span class="pre">modelplot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tls_results</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xlim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(0.48,</span> <span class="pre">0.52)</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fulmar.modelplot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plots the transit model and the lightcurve for visualization purposes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>tls_results</strong> (<cite>transitleastsquaresresults</cite>) – Results from a TLS search</p></li>
+<li><p><strong>xlim</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.10)"><em>tuple</em></a><em>, </em><em>optional</em>) – xlimits for the plot</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+</section>
+<section id="estimators">
+<h2>Estimators<a class="headerlink" href="#estimators" title="Permalink to this headline">¶</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="fulmar.estimate_planet_mass">
 <span class="sig-name descname"><span class="pre">estimate_planet_mass</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">R_p</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rho_p</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fulmar.estimate_planet_mass" title="Permalink to this definition">¶</a></dt>
@@ -787,8 +825,8 @@ given parameters.</p>
 <li><p><strong>period</strong> (<cite>~astropy.units.Quantity</cite> or float) – The period to use for folding. (defaults to units of days)</p></li>
 <li><p><strong>M_star</strong> (<cite>~astropy.units.Quantity</cite> or float) – Stellar mass (defaults to units of solar masses)</p></li>
 <li><p><strong>M_planet</strong> (<cite>~astropy.units.Quantity</cite> or float) – Mass of the exolanet. (defaults to units of Earth masses)</p></li>
-<li><p><strong>R_p</strong> (<cite>~astropy.units.Quantity</cite> or float) – Radius of the exolanet. (defaults to units of Earth radii)</p></li>
-<li><p><strong>rho_p</strong> (<cite>~astropy.units.Quantity</cite>, float or str) – Density of the exoplanet in kg * m^-3. Can be “Earth” or “Neptune”.</p></li>
+<li><p><strong>R_planet</strong> (<cite>~astropy.units.Quantity</cite> or float) – Radius of the exolanet. (defaults to units of Earth radii)</p></li>
+<li><p><strong>rho_planet</strong> (<cite>~astropy.units.Quantity</cite>, float or str) – Density of the exoplanet in kg * m^-3. Can be “Earth” or “Neptune”.</p></li>
 <li><p><strong>inc</strong> (<cite>~astropy.units.Quantity</cite> or float) – Orbital inclination (in degrees). Default: 90.</p></li>
 <li><p><strong>ecc</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a>) – Orbital eccentricity. Default: 0.</p></li>
 </ul>
@@ -806,9 +844,7 @@ given parameters.</p>
 <span id="time"></span><h2>Time<a class="headerlink" href="#module-fulmar.time" title="Permalink to this headline">¶</a></h2>
 <p>Adds the RJD time format for use by Astropy’s <cite>Time</cite> object.
 Caution: AstroPy time objects make a distinction between a time’s format
-(e.g. ISO, JD, MJD) and its scale (e.g. UTC, TDB).
-Note: the class below derive from an <cite>astropy</cite> meta class which
-will automatically register the format for use in <cite>astropy.time.Time</cite> objects.</p>
+(e.g. ISO, JD, MJD) and its scale (e.g. UTC, TDB).</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="fulmar.time.TimeRJD">
 <em class="property"><span class="pre">class</span> </em><span class="sig-name descname"><span class="pre">TimeRJD</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">val1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">val2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scale</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">precision</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">in_subfmt</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out_subfmt</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">from_jd</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fulmar.time.TimeRJD" title="Permalink to this definition">¶</a></dt>
@@ -818,28 +854,9 @@ For example, 51544.5 in RJD is midnight on January 1, 2000.
 Typically used in DACE.
 RJD = JD − 2400000</p>
 </dd></dl>
-</section>
-<section id="module-fulmar.utils">
-<span id="utils"></span><h2>Utils<a class="headerlink" href="#module-fulmar.utils" title="Permalink to this headline">¶</a></h2>
-<dl class="py exception">
-<dt class="sig sig-object py" id="fulmar.utils.FulmarError">
-<em class="property"><span class="pre">exception</span> </em><span class="sig-name descname"><span class="pre">FulmarError</span></span><a class="headerlink" href="#fulmar.utils.FulmarError" title="Permalink to this definition">¶</a></dt>
-<dd><p>To raise exceptions related to FULMAR</p>
-</dd></dl>
-<dl class="py exception">
-<dt class="sig sig-object py" id="fulmar.utils.FulmarWarning">
-<em class="property"><span class="pre">exception</span> </em><span class="sig-name descname"><span class="pre">FulmarWarning</span></span><a class="headerlink" href="#fulmar.utils.FulmarWarning" title="Permalink to this definition">¶</a></dt>
-<dd><p>Class from warning to be displayed as
-“FulmarWarning”</p>
-</dd></dl>
 <dl class="py function">
-<dt class="sig sig-object py" id="fulmar.utils.print_version">
-<span class="sig-name descname"><span class="pre">print_version</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#fulmar.utils.print_version" title="Permalink to this definition">¶</a></dt>
-<dd><p>Prints the version of fulmar used.</p>
-</dd></dl>
-<dl class="py function">
-<dt class="sig sig-object py" id="fulmar.utils.rjd_to_astropy_time">
-<span class="sig-name descname"><span class="pre">rjd_to_astropy_time</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rjd</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">astropy.time.core.Time</span></span></span><a class="headerlink" href="#fulmar.utils.rjd_to_astropy_time" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="fulmar.time.rjd_to_astropy_time">
+<span class="sig-name descname"><span class="pre">rjd_to_astropy_time</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rjd</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">astropy.time.core.Time</span></span></span><a class="headerlink" href="#fulmar.time.rjd_to_astropy_time" title="Permalink to this definition">¶</a></dt>
 <dd><p>Converts Reduced Julian Day (RJD) time values to an
 <cite>~astropy.time.Time</cite> object.
 Reduced Julian Day (RJD) is a Julian day minus 2400000.0
@@ -858,11 +875,30 @@ time system that is not affected by leap seconds.</p>
 </dd>
 </dl>
 </dd></dl>
+</section>
+<section id="module-fulmar.utils">
+<span id="utils"></span><h2>Utils<a class="headerlink" href="#module-fulmar.utils" title="Permalink to this headline">¶</a></h2>
+<dl class="py exception">
+<dt class="sig sig-object py" id="fulmar.utils.FulmarError">
+<em class="property"><span class="pre">exception</span> </em><span class="sig-name descname"><span class="pre">FulmarError</span></span><a class="headerlink" href="#fulmar.utils.FulmarError" title="Permalink to this definition">¶</a></dt>
+<dd><p>To raise exceptions related to FULMAR</p>
+</dd></dl>
+<dl class="py exception">
+<dt class="sig sig-object py" id="fulmar.utils.FulmarWarning">
+<em class="property"><span class="pre">exception</span> </em><span class="sig-name descname"><span class="pre">FulmarWarning</span></span><a class="headerlink" href="#fulmar.utils.FulmarWarning" title="Permalink to this definition">¶</a></dt>
+<dd><p>Class from warning to be displayed as
+“FulmarWarning”</p>
+</dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="fulmar.utils.print_version">
+<span class="sig-name descname"><span class="pre">print_version</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#fulmar.utils.print_version" title="Permalink to this definition">¶</a></dt>
+<dd><p>Prints the version of FULMAR used.</p>
+</dd></dl>
 <dl class="py function">
 <dt class="sig sig-object py" id="fulmar.utils.warning_on_one_line">
 <span class="sig-name descname"><span class="pre">warning_on_one_line</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">category</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lineno</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">line</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fulmar.utils.warning_on_one_line" title="Permalink to this definition">¶</a></dt>
 <dd><p>Function to display warnings on one line, as to avoid displaying
-‘warnings.warn(‘warning message’)’ under the ‘warning message’, for clarity.</p>
+‘warnings.warn(‘warning message’)’ under the ‘warning message’</p>
 </dd></dl>
 </section>
 </section>
@@ -921,6 +957,7 @@ time system that is not affected by leap seconds.</p>
 <li><a class="reference internal" href="#">API documentation</a><ul>
 <li><a class="reference internal" href="#target-object">Target object</a></li>
 <li><a class="reference internal" href="#functions">Functions</a></li>
+<li><a class="reference internal" href="#estimators">Estimators</a></li>
 <li><a class="reference internal" href="#module-fulmar.time">Time</a></li>
 <li><a class="reference internal" href="#module-fulmar.utils">Utils</a></li>
 </ul>

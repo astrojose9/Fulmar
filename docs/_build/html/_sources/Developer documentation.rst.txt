@@ -1,8 +1,8 @@
 Developer documentation
 =======================
 
-Contibuting
------------
+Contributing
+------------
 
 If you're not familiar with the workflow for contributing code to a GitHub
 repository, an excellent place to start is the `AstroPy developer docs

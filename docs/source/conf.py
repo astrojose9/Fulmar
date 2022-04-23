@@ -64,8 +64,8 @@ html_theme_options = {
     "light_logo": "FULMAR_logo_light_mode.png",
     "dark_logo": "FULMAR_logo_name.png",
 
-    'logo_only': True,
-    'display_version': False,
+#    'logo_only': True,
+#    'display_version': False,
 
     "sidebar_hide_name": True,
     "light_css_variables": {
