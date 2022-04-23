@@ -335,6 +335,8 @@ def read_lc_from_file(
                 warnings.warn('number of items in colnames should match '
                               'the number of columns in the data',
                               FulmarWarning)
+                t_1 = Table(t_1, names=colnames[:len(t_1.colnames)])  #cuts
+
 
         if 'time' not in colnames:
             raise ValueError("A 'time' column is required")
@@ -813,7 +815,60 @@ def GP_fit(time, flux, flux_err=None, mode='rotation',
     return trace, flat_samps
 
 
-def params_optimizer(timeseries, period_guess, t0_guess, depth_guess, ab, r_star, target_id, tran_window=0.25, ncores=None, mask=None):
+def params_optimizer(timeseries, period_guess, t0_guess, depth_guess, ab,
+                     r_star, target_id, tran_window=0.25, tune=2500,
+                     draws=2500, chains=2, target_accept=0.95,
+                     ncores=None, mask=None):
+    """Translates the target identifiers between different catalogs
+    such as TIC to TOI in the case of TESS or EPIC to KIC" for K2
+
+    Parameters
+    ----------
+    timeseries : `~astropy.timeseries.TimeSeries`, optional
+        TimeSeries object
+    period_guess : int or float
+        Initial estimate of the orbital period
+    t0_guess : int or float
+        Inital estimate of the mid-transit time
+        of the first transit within the time series
+    depth_guess : float
+        Initial estimate of the transit depth
+    ab : tuple of floats
+        Quadratic limb darkening parameters a, b.
+    r_star : float
+        Stellar radius (in units of solar radii).
+    target_id : str
+        Name of the target as a string
+    tran_window : int or float
+        Window around the center of transits for efficiency (in units of days)
+    tune : int, optional
+        number of tune iterations
+    draws : int, optional
+        number of draws iterations
+    chains : int, optional
+        number of chains to sample
+    target_accept : float, optional
+        number should be between 0 and 1
+    ncores : int, optional
+        Number of cores to use for processing. (Default: all)
+    mask : boolean array with length of time
+        Boolean array to mask data, typically transits. Data where mask is
+        "False" will not be taken into account for the fit.
+
+    Returns
+    -------
+    p : float
+        Orbital period
+    t0 : float
+        Mid-transit time of the first transit within the time series
+    dur :
+        Duration of the transit
+    depth :
+        Depth of the transit
+    ab : tuple of floats
+        Quadratic limb darkening parameters a, b.
+    flat_samps : `xarray.core.dataset.Dataset`
+    """
     if ncores is None:
         ncores = multiprocessing.cpu_count()
     print('running on {} cores'.format(ncores))
@@ -933,15 +988,15 @@ def params_optimizer(timeseries, period_guess, t0_guess, depth_guess, ab, r_star
 #         _ = plt.xlim(-tran_window, tran_window)
 #         plt.show()
 
-        np.random.seed(42)
+        np.random.seed(26)
         with model:
             trace = pmx.sample(
-                tune=2500,
-                draws=2000,
+                tune=tune,
+                draws=draws,
                 start=map_soln,
-                chains=2,
+                chains=chains,
                 cores=ncores,
-                target_accept=0.96,
+                target_accept=target_accept,
                 return_inferencedata=True,
             )
 
@@ -1021,6 +1076,7 @@ def params_optimizer(timeseries, period_guess, t0_guess, depth_guess, ab, r_star
         plt.show()
 
         return p, t0, dur, depth, ab, flat_samps
+
 
 
 def perioplot(tls_results, target, folder, pl_n, maxper=None, savefig=False):
