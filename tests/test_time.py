@@ -1,6 +1,6 @@
 import os
 import sys
-sys.path.insert(0, os.path.abspath('/home/jrodrigues/Documents/PhD/fulmar'))
+#sys.path.insert(0, os.path.abspath('/home/jrodrigues/Documents/PhD/fulmar'))
 
 from astropy.time import Time
 from fulmar.time import (
