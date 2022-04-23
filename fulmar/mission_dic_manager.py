@@ -16,14 +16,15 @@ def read_json_dic(json_dic):
 
 
 def tessDic(tessCat):
+    # https://tev.mit.edu/data/collection/193/
     tess_table = Table.read(tessCat, format='ascii.csv', comment='#')
     tess_table.rename_columns(tess_table.colnames, [
                               c.replace(' ', '_')
                               for c in tess_table.colnames])
-    tess_table['TIC'] = ['TIC' + x for x in tess_table['tid'].astype(str)]
+    tess_table['TIC'] = ['TIC' + x for x in tess_table['TIC'].astype(str)]
 
-    tess_table['TOI'] = ['TOI-' + x
-                         for x in tess_table['toipfx'].astype(str)]
+    tess_table['TOI'] = ['TOI-' + x.split('.')[0]
+                         for x in tess_table['Full_TOI_ID'].astype(str)]
 
     tic2toi_dic = dict(zip(tess_table['TIC'], tess_table['TOI']))
     toi2tic_dic = dict(zip(tess_table['TOI'], tess_table['TIC']))
