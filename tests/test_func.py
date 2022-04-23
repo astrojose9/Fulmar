@@ -1,4 +1,8 @@
-from astopy.table import Table
+import os
+import sys
+sys.path.insert(0, os.path.abspath('/home/jrodrigues/Documents/PhD/fulmar'))
+
+from astropy.table import Table
 from astropy.time import Time
 from astropy.timeseries import TimeSeries
 import astropy.units as u
@@ -76,14 +80,14 @@ def test_read_lc_from_file():
     # First, the simple case of a 3 column file with no headers
     lc = read_lc_from_file('simple_table.txt')
 
-    assert lc.colnames == ['time', 'flux', 'flux_err']
+    assert lc.colnames == ['time', 'flux', 'flux_err', 'exptime']
     assert lc.time.format == 'jd'
     npt.assert_array_equal(lc.time.value, np.array([1, 2, 3]))
     npt.assert_array_equal(lc.flux.value, np.array([1, 1, 1]))
     npt.assert_array_equal(lc.flux_err.value, np.array([0.1, 0.1, 0.1]))
 
     # Test if the exptime column behaves as expected
-    npt.assert_array_equal(lc['exptime'], np.array([1, 1, 1]))
+    npt.assert_array_equal(lc['exptime'].value, np.array([86400, 86400, 86400]))
 
     # Now let's try naming the columns
     # Using expected names:
@@ -130,7 +134,7 @@ def test_read_lc_from_file():
 
     # Correct headers in the file
     lc = read_lc_from_file('simple_table_correct_cols.txt')
-    assert lc.colnames == ['time', 'flux', 'flux_err']
+    assert lc.colnames == ['time', 'flux', 'flux_err', 'exptime']
     assert lc.time.format == 'jd'
     npt.assert_array_equal(lc.time.value, np.array([1, 2, 3]))
     npt.assert_array_equal(lc.flux.value, np.array([1, 1, 1]))
@@ -139,11 +143,11 @@ def test_read_lc_from_file():
 
 def test_normalize_lc():
     """Test if normalize_lc actually normalizes the lightcurve"""
-    lc = lk.lightkurve(time=np.arange(5), flux=3 * np.ones(5),
+    lc = lk.LightCurve(time=np.arange(5), flux=3 * np.ones(5),
                        flux_err=0.1 * np.ones(5))
 
     npt.assert_allclose(np.median(normalize_lc(lc).flux), 1)
-    npt.assert_allclose(np.median(normalize_lc(lc).flux_err), 0.1 / 4)
+    npt.assert_allclose(np.median(normalize_lc(lc).flux_err), 0.1 / 3)
 
 
 def test_time_flux_err():
@@ -156,10 +160,11 @@ def test_time_flux_err():
     dirty_array[3] = -np.inf
     dirty_array[4] = np.nan
     dirty_array[5] = -99
-    time_array[8] = np.nan
+    # time_array[8] = np.nan
     dy_array[9] = np.inf
     ts = TimeSeries([Time(time_array, format='jd'), dirty_array, dy_array],
                     names=['time', 'flux', 'flux_err'])
+    ts.time[8] = np.nan
 
     t, y, dy = time_flux_err(ts)
     npt.assert_equal(t, [1, 7, 8])
@@ -170,12 +175,13 @@ def test_time_flux_err():
     dy_array = time_array * np.nan
     ts = TimeSeries([Time(time_array, format='jd'), dirty_array, dy_array],
                     names=['time', 'flux', 'flux_err'])
+    ts.time[8] = np.nan
     # replace_nan_err is True
     t, y, dy = time_flux_err(ts)
-    npt.assert_equal(dy, [0, 0, 0])
+    npt.assert_equal(dy, [0, 0, 0, 0])
     # replace_nan_err is False
     t, y, dy = time_flux_err(ts, replace_nan_err=False)
-    npt.assert_array_equal(np.array([True, True, True]), np.isnan(dy))
+    npt.assert_array_equal(np.array([True, True, True, True]), np.isnan(dy))
 
 
 def test_ts_binner():
@@ -205,15 +211,15 @@ def test_fbn():
 
     ts = TimeSeries([Time(testtime * u.d, format='jd'),
                      testflux], names=['time', 'flux'])
-    ts_fold, ts_fold_bin = fbn(ts, 2., 5., 2 * u.d)
+    ts_fold, ts_fold_bin = fbn(ts, 2, 5, 2 * u.d, 20)
 
     npt.assert_equal(len(ts_fold), 1000)
     npt.assert_equal(len(ts_fold_bin), 20)
-    expected_flux_bin = np.array([-0.95, -0.85, -0.75, -0.65, -0.55, -0.45,
+    expected_time_bin = np.array([-0.95, -0.85, -0.75, -0.65, -0.55, -0.45,
                                   -0.35, -0.25, -0.15, -0.05, 0.05, 0.15, 0.25,
                                   0.35, 0.45, 0.55, 0.65, 0.75, 0.85, 0.95])
 
     npt.assert_almost_equal(ts_fold['phase_norm'], ts_fold.time.value / 2)
-    npt.assert_almost_equal(ts_fold_bin['flux'], expected_flux_bin)
+    npt.assert_almost_equal(ts_fold_bin['time'].value, expected_time_bin)
     npt.assert_almost_equal(ts_fold['phase_norm'].max(), 0.4954955)
     npt.assert_almost_equal(ts_fold['phase_norm'].min(), -.5)
