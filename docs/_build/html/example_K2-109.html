@@ -1,0 +1,2062 @@
+<!doctype html>
+<html class="no-js">
+  <head><meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="prev" title="API documentation" href="api.html" />
+
+    <meta name="generator" content="sphinx-4.2.0, furo 2021.11.23"/>
+        <title>Basic FULMAR usage. Using K2-109 as an example - FULMAR documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?digest=7f0192ddeb2adecfbaa87ffbcf67d16358b30bc1" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?digest=0af69da206d614734f649b27d4cdc2dd6c31f41d" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #eeffcc;
+  --color-code-foreground: black;
+  --color-brand-primary: #02B01A;
+  --color-brand-content: #02B01A;
+  --color-problematic: #00b300;
+  
+  }
+  body[data-theme="dark"] {
+    --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  --color-foreground-primary: #ffffffcc;
+  --color-foreground-secondary: #9ca0a2;
+  --color-foreground-muted: #818d86;
+  --color-foreground-border: #666666;
+  --color-background-primary: #222522;
+  --color-background-secondary: #2a2c2a;
+  --color-background-hover: #1e2421ff;
+  --color-background-hover--transparent: #1e242100;
+  --color-background-border: #303335;
+  --color-background-item: #cccccc;
+  --color-brand-primary: #02B01A;
+  --color-brand-content: #02B01A;
+  --color-highlighted-background: #086533;
+  --color-guilabel-background: #0863358;
+  --color-guilabel-border: #135f3980;
+  --color-highlight-on-target: #330033;
+  --color-card-background: #181a18;
+  --color-problematic: #51ee51;
+  --color-announcement-background: #ccccccdd;
+  --color-announcement-text: #eeebee;
+  
+  }
+  @media (prefers-color-scheme: dark) {
+    body:not([data-theme="light"]) {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  --color-foreground-primary: #ffffffcc;
+  --color-foreground-secondary: #9ca0a2;
+  --color-foreground-muted: #818d86;
+  --color-foreground-border: #666666;
+  --color-background-primary: #222522;
+  --color-background-secondary: #2a2c2a;
+  --color-background-hover: #1e2421ff;
+  --color-background-hover--transparent: #1e242100;
+  --color-background-border: #303335;
+  --color-background-item: #cccccc;
+  --color-brand-primary: #02B01A;
+  --color-brand-content: #02B01A;
+  --color-highlighted-background: #086533;
+  --color-guilabel-background: #0863358;
+  --color-guilabel-border: #135f3980;
+  --color-highlight-on-target: #330033;
+  --color-card-background: #181a18;
+  --color-problematic: #51ee51;
+  --color-announcement-background: #ccccccdd;
+  --color-announcement-text: #eeebee;
+  
+    }
+  }
+</style></head>
+  <body>
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <path stroke="none" d="M0 0h24v24H0z" />
+      <line x1="4" y1="6" x2="20" y2="6" />
+      <line x1="10" y1="12" x2="20" y2="12" />
+      <line x1="6" y1="18" x2="20" y2="18" />
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-half" viewBox="0 0 24 24">
+    <title>Auto light/dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-shadow">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M13 12h5" />
+      <path d="M13 15h4" />
+      <path d="M13 18h1" />
+      <path d="M13 9h4" />
+      <path d="M13 6h1" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc">
+<label class="overlay sidebar-overlay" for="__navigation">
+  <div class="visually-hidden">Hide navigation sidebar</div>
+</label>
+<label class="overlay toc-overlay" for="__toc">
+  <div class="visually-hidden">Hide table of contents sidebar</div>
+</label>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <div class="visually-hidden">Toggle site navigation sidebar</div>
+        <i class="icon"><svg><use href="#svg-menu"></use></svg></i>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="index.html"><div class="brand">FULMAR  documentation</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle">
+          <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+          <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <div class="visually-hidden">Toggle table of contents sidebar</div>
+        <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="index.html">
+  
+  <div class="sidebar-logo-container">
+    <img class="sidebar-logo only-light" src="_static/FULMAR_logo_light_mode.png" alt="Light Logo"/>
+    <img class="sidebar-logo only-dark" src="_static/FULMAR_logo_name.png" alt="Dark Logo"/>
+  </div>
+  
+  
+</a><form class="sidebar-search-container" method="get" action="search.html" role="search">
+  <input class="sidebar-search" placeholder=Search name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="Installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Developer%20documentation.html">Developer documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API documentation</a></li>
+<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Basic FULMAR usage. Using K2-109 as an example</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/astrojose9/fulmar/issues">Submit an issue</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/astrojose9/fulmar">Source at Github</a></li>
+</ul>
+
+</div>
+</div>
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <div class="content-icon-container">
+          <div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle">
+              <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+              <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <div class="visually-hidden">Toggle table of contents sidebar</div>
+            <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+          </label>
+        </div>
+        <article role="main">
+          
+<style>
+/* CSS for nbsphinx extension */
+
+/* remove conflicting styling from Sphinx themes */
+div.nbinput.container div.prompt *,
+div.nboutput.container div.prompt *,
+div.nbinput.container div.input_area pre,
+div.nboutput.container div.output_area pre,
+div.nbinput.container div.input_area .highlight,
+div.nboutput.container div.output_area .highlight {
+    border: none;
+    padding: 0;
+    margin: 0;
+    box-shadow: none;
+}
+
+div.nbinput.container > div[class*=highlight],
+div.nboutput.container > div[class*=highlight] {
+    margin: 0;
+}
+
+div.nbinput.container div.prompt *,
+div.nboutput.container div.prompt * {
+    background: none;
+}
+
+div.nboutput.container div.output_area .highlight,
+div.nboutput.container div.output_area pre {
+    background: unset;
+}
+
+div.nboutput.container div.output_area div.highlight {
+    color: unset;  /* override Pygments text color */
+}
+
+/* avoid gaps between output lines */
+div.nboutput.container div[class*=highlight] pre {
+    line-height: normal;
+}
+
+/* input/output containers */
+div.nbinput.container,
+div.nboutput.container {
+    display: -webkit-flex;
+    display: flex;
+    align-items: flex-start;
+    margin: 0;
+    width: 100%;
+}
+@media (max-width: 540px) {
+    div.nbinput.container,
+    div.nboutput.container {
+        flex-direction: column;
+    }
+}
+
+/* input container */
+div.nbinput.container {
+    padding-top: 5px;
+}
+
+/* last container */
+div.nblast.container {
+    padding-bottom: 5px;
+}
+
+/* input prompt */
+div.nbinput.container div.prompt pre {
+    color: #307FC1;
+}
+
+/* output prompt */
+div.nboutput.container div.prompt pre {
+    color: #BF5B3D;
+}
+
+/* all prompts */
+div.nbinput.container div.prompt,
+div.nboutput.container div.prompt {
+    width: 4.5ex;
+    padding-top: 5px;
+    position: relative;
+    user-select: none;
+}
+
+div.nbinput.container div.prompt > div,
+div.nboutput.container div.prompt > div {
+    position: absolute;
+    right: 0;
+    margin-right: 0.3ex;
+}
+
+@media (max-width: 540px) {
+    div.nbinput.container div.prompt,
+    div.nboutput.container div.prompt {
+        width: unset;
+        text-align: left;
+        padding: 0.4em;
+    }
+    div.nboutput.container div.prompt.empty {
+        padding: 0;
+    }
+
+    div.nbinput.container div.prompt > div,
+    div.nboutput.container div.prompt > div {
+        position: unset;
+    }
+}
+
+/* disable scrollbars on prompts */
+div.nbinput.container div.prompt pre,
+div.nboutput.container div.prompt pre {
+    overflow: hidden;
+}
+
+/* input/output area */
+div.nbinput.container div.input_area,
+div.nboutput.container div.output_area {
+    -webkit-flex: 1;
+    flex: 1;
+    overflow: auto;
+}
+@media (max-width: 540px) {
+    div.nbinput.container div.input_area,
+    div.nboutput.container div.output_area {
+        width: 100%;
+    }
+}
+
+/* input area */
+div.nbinput.container div.input_area {
+    border: 1px solid #e0e0e0;
+    border-radius: 2px;
+    /*background: #f5f5f5;*/
+}
+
+/* override MathJax center alignment in output cells */
+div.nboutput.container div[class*=MathJax] {
+    text-align: left !important;
+}
+
+/* override sphinx.ext.imgmath center alignment in output cells */
+div.nboutput.container div.math p {
+    text-align: left;
+}
+
+/* standard error */
+div.nboutput.container div.output_area.stderr {
+    background: #fdd;
+}
+
+/* ANSI colors */
+.ansi-black-fg { color: #3E424D; }
+.ansi-black-bg { background-color: #3E424D; }
+.ansi-black-intense-fg { color: #282C36; }
+.ansi-black-intense-bg { background-color: #282C36; }
+.ansi-red-fg { color: #E75C58; }
+.ansi-red-bg { background-color: #E75C58; }
+.ansi-red-intense-fg { color: #B22B31; }
+.ansi-red-intense-bg { background-color: #B22B31; }
+.ansi-green-fg { color: #00A250; }
+.ansi-green-bg { background-color: #00A250; }
+.ansi-green-intense-fg { color: #007427; }
+.ansi-green-intense-bg { background-color: #007427; }
+.ansi-yellow-fg { color: #DDB62B; }
+.ansi-yellow-bg { background-color: #DDB62B; }
+.ansi-yellow-intense-fg { color: #B27D12; }
+.ansi-yellow-intense-bg { background-color: #B27D12; }
+.ansi-blue-fg { color: #208FFB; }
+.ansi-blue-bg { background-color: #208FFB; }
+.ansi-blue-intense-fg { color: #0065CA; }
+.ansi-blue-intense-bg { background-color: #0065CA; }
+.ansi-magenta-fg { color: #D160C4; }
+.ansi-magenta-bg { background-color: #D160C4; }
+.ansi-magenta-intense-fg { color: #A03196; }
+.ansi-magenta-intense-bg { background-color: #A03196; }
+.ansi-cyan-fg { color: #60C6C8; }
+.ansi-cyan-bg { background-color: #60C6C8; }
+.ansi-cyan-intense-fg { color: #258F8F; }
+.ansi-cyan-intense-bg { background-color: #258F8F; }
+.ansi-white-fg { color: #C5C1B4; }
+.ansi-white-bg { background-color: #C5C1B4; }
+.ansi-white-intense-fg { color: #A1A6B2; }
+.ansi-white-intense-bg { background-color: #A1A6B2; }
+
+.ansi-default-inverse-fg { color: #FFFFFF; }
+.ansi-default-inverse-bg { background-color: #000000; }
+
+.ansi-bold { font-weight: bold; }
+.ansi-underline { text-decoration: underline; }
+
+
+div.nbinput.container div.input_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight].math,
+div.nboutput.container div.output_area.rendered_html,
+div.nboutput.container div.output_area > div.output_javascript,
+div.nboutput.container div.output_area:not(.rendered_html) > img{
+    padding: 5px;
+    margin: 0;
+}
+
+/* fix copybtn overflow problem in chromium (needed for 'sphinx_copybutton') */
+div.nbinput.container div.input_area > div[class^='highlight'],
+div.nboutput.container div.output_area > div[class^='highlight']{
+    overflow-y: hidden;
+}
+
+/* hide copybtn icon on prompts (needed for 'sphinx_copybutton') */
+.prompt a.copybtn {
+    display: none;
+}
+
+/* Some additional styling taken form the Jupyter notebook CSS */
+div.rendered_html table {
+  border: none;
+  border-collapse: collapse;
+  border-spacing: 0;
+  color: black;
+  font-size: 12px;
+  table-layout: fixed;
+}
+div.rendered_html thead {
+  border-bottom: 1px solid black;
+  vertical-align: bottom;
+}
+div.rendered_html tr,
+div.rendered_html th,
+div.rendered_html td {
+  text-align: right;
+  vertical-align: middle;
+  padding: 0.5em 0.5em;
+  line-height: normal;
+  white-space: normal;
+  max-width: none;
+  border: none;
+}
+div.rendered_html th {
+  font-weight: bold;
+}
+div.rendered_html tbody tr:nth-child(odd) {
+  background: #f5f5f5;
+}
+div.rendered_html tbody tr:hover {
+  background: rgba(66, 165, 245, 0.2);
+}
+</style>
+<section id="Basic-FULMAR-usage.-Using-K2-109-as-an-example">
+<h1>Basic FULMAR usage. Using K2-109 as an example<a class="headerlink" href="#Basic-FULMAR-usage.-Using-K2-109-as-an-example" title="Permalink to this headline">¶</a></h1>
+<p>This system contains two known exoplanets. For more information, have a look at <a class="reference external" href="https://www.aanda.org/articles/aa/pdf/2017/12/aa31276-17.pdf">Barros et al. 2017</a></p>
+<p>Let’s start by importing common modules</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">fulmar</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">astropy.units</span> <span class="k">as</span> <span class="nn">u</span>
+<span class="kn">from</span> <span class="nn">transitleastsquares</span> <span class="kn">import</span> <span class="n">transit_mask</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+WARNING (theano.tensor.blas): Using NumPy C-API based implementation for BLAS functions.
+</pre></div></div>
+</div>
+<section id="Define-target">
+<h2>Define target<a class="headerlink" href="#Define-target" title="Permalink to this headline">¶</a></h2>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">lc_targ</span> <span class="o">=</span> <span class="n">fulmar</span><span class="o">.</span><span class="n">target</span><span class="p">(</span><span class="s1">'K2-109'</span><span class="p">)</span> <span class="c1"># aka. HD 106315</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+WARNING: UnitsWarning: Unit 'Rsun' not supported by the VOUnit standard.  [astropy.units.format.vounit]
+WARNING: UnitsWarning: Unit 'Msun' not supported by the VOUnit standard.  [astropy.units.format.vounit]
+</pre></div></div>
+</div>
+<section id="Update-stellar-parameters-if-necessary">
+<h3>Update stellar parameters if necessary<a class="headerlink" href="#Update-stellar-parameters-if-necessary" title="Permalink to this headline">¶</a></h3>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="c1"># K2-109 parameters from Barros et al. 2017 (https://www.aanda.org/articles/aa/pdf/2017/12/aa31276-17.pdf)</span>
+<span class="n">lc_targ</span><span class="o">.</span><span class="n">R_star</span> <span class="o">=</span> <span class="mf">1.296</span>
+<span class="n">lc_targ</span><span class="o">.</span><span class="n">R_star_max</span> <span class="o">=</span> <span class="mf">0.058</span>
+<span class="n">lc_targ</span><span class="o">.</span><span class="n">R_star_min</span> <span class="o">=</span> <span class="mf">0.058</span>
+
+<span class="n">lc_targ</span><span class="o">.</span><span class="n">M_star</span> <span class="o">=</span> <span class="mf">1.091</span>
+<span class="n">lc_targ</span><span class="o">.</span><span class="n">M_star_max</span> <span class="o">=</span> <span class="mf">0.036</span>
+<span class="n">lc_targ</span><span class="o">.</span><span class="n">M_star_min</span> <span class="o">=</span> <span class="mf">0.036</span>
+</pre></div>
+</div>
+</div>
+</section>
+</section>
+<section id="Build-the-lightcurve">
+<h2>Build the lightcurve<a class="headerlink" href="#Build-the-lightcurve" title="Permalink to this headline">¶</a></h2>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">lc_targ</span><span class="o">.</span><span class="n">build_lightcurve</span><span class="p">(</span><span class="n">author</span><span class="o">=</span><span class="s1">'EVEREST'</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Searching for lightcurves
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Warning: 25% (851/3384) of the cadences will be ignored due to the quality mask (quality_bitmask=1130799).
+Warning: 25% (851/3384) of the cadences will be ignored due to the quality mask (quality_bitmask=1130799).
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+['K2 Campaign 102']
+1 Lightcurves found
+Downloading Lightcurves
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div><i>TimeSeries length=2533</i>
+<div class="table-wrapper"><table class="table-striped table-bordered table-condensed" id="table139895255489504">
+<thead><tr><th>time</th><th>flux</th><th>flux_err</th><th>cadn</th><th>fraw</th><th>cadenceno</th><th>fraw_err</th><th>quality</th><th>fcor</th><th>cbv01</th><th>cbv02</th><th>cbv03</th><th>cbv04</th><th>cbv05</th><th>cbv06</th><th>exptime</th></tr></thead>
+<thead><tr><th></th><th></th><th></th><th></th><th>electron / s</th><th></th><th>electron / s</th><th></th><th>electron / s</th><th></th><th></th><th></th><th></th><th></th><th></th><th>s</th></tr></thead>
+<thead><tr><th>Time</th><th>float64</th><th>float64</th><th>float64</th><th>float64</th><th>float64</th><th>float64</th><th>int32</th><th>float64</th><th>float64</th><th>float64</th><th>float64</th><th>float64</th><th>float64</th><th>float64</th><th>float64</th></tr></thead>
+<tr><td>2749.5899533941338</td><td>0.9919362273818925</td><td>nan</td><td>129231.0</td><td>3616934.469760895</td><td>129231.0</td><td>47.413345756122425</td><td>524288</td><td>3618895.8239213014</td><td>1.0</td><td>4.032601813062183</td><td>3.721325487340294</td><td>-0.6272998722503135</td><td>2.7580352239694506</td><td>0.9449693607767682</td><td>1800.0</td></tr>
+<tr><td>2749.6103854284593</td><td>0.9919057528017547</td><td>nan</td><td>129232.0</td><td>3616898.694656372</td><td>129232.0</td><td>47.4206060553783</td><td>0</td><td>3618797.79577493</td><td>1.0</td><td>4.036445303100602</td><td>3.709970058424757</td><td>-0.639482652969744</td><td>2.7337745018705517</td><td>0.9413711769034284</td><td>1800.0</td></tr>
+<tr><td>2749.6308173623256</td><td>0.9920318018415252</td><td>nan</td><td>129233.0</td><td>3617448.0032958984</td><td>129233.0</td><td>47.43482627636655</td><td>0</td><td>3619268.647123106</td><td>1.0</td><td>4.040263871939855</td><td>3.698637940508874</td><td>-0.6516019999249221</td><td>2.7095909556591535</td><td>0.9377823016121527</td><td>1800.0</td></tr>
+<tr><td>2749.6512491959584</td><td>0.9919802015869569</td><td>nan</td><td>129234.0</td><td>3617286.1815719604</td><td>129234.0</td><td>47.44625835297297</td><td>0</td><td>3619093.66213457</td><td>1.0</td><td>4.044057555765272</td><td>3.687329095681801</td><td>-0.6636580207756357</td><td>2.685484485807006</td><td>0.9342027182885964</td><td>1800.0</td></tr>
+<tr><td>2749.6716812293525</td><td>0.992301349055998</td><td>nan</td><td>129235.0</td><td>3618496.683452606</td><td>129235.0</td><td>47.469152065594365</td><td>0</td><td>3620273.5298203984</td><td>1.0</td><td>4.047826390762182</td><td>3.676043486032692</td><td>-0.6756508231816731</td><td>2.6614549927858597</td><td>0.930632410318415</td><td>1800.0</td></tr>
+<tr><td>2749.6921131622876</td><td>0.9923487483914822</td><td>nan</td><td>129236.0</td><td>3618750.0302505493</td><td>129236.0</td><td>47.48211093867445</td><td>0</td><td>3620458.2428743644</td><td>1.0</td><td>4.051570413115917</td><td>3.664781073650703</td><td>-0.6875805148028225</td><td>2.6375023770674657</td><td>0.9270713610872642</td><td>1800.0</td></tr>
+<tr><td>2749.712544994756</td><td>0.9923954335698577</td><td>nan</td><td>129237.0</td><td>3618955.9937667847</td><td>129237.0</td><td>47.49448540389917</td><td>0</td><td>3620640.277803066</td><td>1.0</td><td>4.055289659011805</td><td>3.6535418206249886</td><td>-0.6994472032988717</td><td>2.613626539123574</td><td>0.9235195539807992</td><td>1800.0</td></tr>
+<tr><td>2749.732977027219</td><td>0.9925266324082855</td><td>nan</td><td>129238.0</td><td>3619466.253112793</td><td>129238.0</td><td>47.507834395667736</td><td>0</td><td>3621129.43718082</td><td>1.0</td><td>4.058984164635178</td><td>3.642325689044705</td><td>-0.7112509963296089</td><td>2.589827379425935</td><td>0.9199769723846757</td><td>1800.0</td></tr>
+<tr><td>2749.75340895899</td><td>0.9925245517214502</td><td>nan</td><td>129239.0</td><td>3619449.8608169556</td><td>129239.0</td><td>47.52051862733021</td><td>0</td><td>3621134.0445883283</td><td>1.0</td><td>4.062653966171363</td><td>3.6311326409990063</td><td>-0.7229920015548223</td><td>2.5661047984463004</td><td>0.916443599684549</td><td>1800.0</td></tr>
+<tr><td>2749.77384079076</td><td>0.992604148341398</td><td>nan</td><td>129240.0</td><td>3619830.804801941</td><td>129240.0</td><td>47.54148128608888</td><td>0</td><td>3621435.4665627684</td><td>1.0</td><td>4.0662990998056925</td><td>3.6199626385770487</td><td>-0.7346703266342999</td><td>2.5424586966564195</td><td>0.9129194192660746</td><td>1800.0</td></tr>
+<tr><td>2749.7942728220587</td><td>0.9925338870317024</td><td>nan</td><td>129241.0</td><td>3619638.970149994</td><td>129241.0</td><td>47.56157806813444</td><td>0</td><td>3621192.074435645</td><td>1.0</td><td>4.0699196017234955</td><td>3.6088156438679864</td><td>-0.7462860792278299</td><td>2.5188889745280436</td><td>0.909404414514908</td><td>1800.0</td></tr>
+<tr><td>2749.8147047528983</td><td>0.9926073018860605</td><td>nan</td><td>129242.0</td><td>3620092.708744049</td><td>129242.0</td><td>47.5904070351304</td><td>0</td><td>3621470.8624807484</td><td>1.0</td><td>4.073515508110102</td><td>3.5976916189609756</td><td>-0.7578393669952004</td><td>2.4953955325329225</td><td>0.9058985688167047</td><td>1800.0</td></tr>
+<tr><td>2749.835136583737</td><td>0.9926726508159865</td><td>nan</td><td>129243.0</td><td>3620588.7246055603</td><td>129243.0</td><td>47.61261592531867</td><td>4202496</td><td>3621720.249503433</td><td>1.0</td><td>4.077086855150842</td><td>3.5865905259451702</td><td>-0.7693302975961993</td><td>2.4719782711428078</td><td>0.9024018655571202</td><td>1800.0</td></tr>
+<tr><td>2749.8555686138716</td><td>0.9928366016424158</td><td>nan</td><td>129244.0</td><td>3621590.49723053</td><td>129244.0</td><td>47.63446913691414</td><td>0</td><td>3622327.9723254293</td><td>1.0</td><td>4.080633679031045</td><td>3.5755123269097266</td><td>-0.780758978690615</td><td>2.448637090829449</td><td>0.89891428812181</td><td>1800.0</td></tr>
+<tr><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td></tr>
+<tr><td>2818.404101452441</td><td>1.0005970765947736</td><td>nan</td><td>132599.0</td><td>3633293.7000579834</td><td>132599.0</td><td>47.82186261899401</td><td>0</td><td>3629823.601130887</td><td>1.0</td><td>-2.165105135304227</td><td>0.3430441145492126</td><td>3.4383054244120492</td><td>0.18877366699696385</td><td>3.5361133038974453</td><td>1800.0</td></tr>
+<tr><td>2818.42453350703</td><td>1.0005313477783007</td><td>nan</td><td>132600.0</td><td>3633612.672267914</td><td>132600.0</td><td>47.82432371418381</td><td>0</td><td>3629576.2479759958</td><td>1.0</td><td>-2.1676468393414416</td><td>0.35742741915056153</td><td>3.476059368846186</td><td>0.1878292816114223</td><td>3.564769882023916</td><td>1800.0</td></tr>
+<tr><td>2818.444965362083</td><td>1.0004984893450761</td><td>nan</td><td>132601.0</td><td>3633727.3173980713</td><td>132601.0</td><td>47.82989274571733</td><td>0</td><td>3629448.307331349</td><td>1.0</td><td>-2.170209975347164</td><td>0.3719028565778023</td><td>3.5139713582739436</td><td>0.18687824843660028</td><td>3.593565810923214</td><td>1800.0</td></tr>
+<tr><td>2818.4653973173627</td><td>1.0005727916549771</td><td>nan</td><td>132602.0</td><td>3634014.084197998</td><td>132602.0</td><td>47.8402087450808</td><td>0</td><td>3629709.8239144934</td><td>1.0</td><td>-2.1727945928832346</td><td>0.3864706142277389</td><td>3.5520416674443522</td><td>0.18592055324433898</td><td>3.622501389120891</td><td>1800.0</td></tr>
+<tr><td>2818.485829373116</td><td>1.000549754409066</td><td>nan</td><td>132603.0</td><td>3633582.8075580597</td><td>132603.0</td><td>47.849561180741254</td><td>0</td><td>3629617.440560636</td><td>1.0</td><td>-2.1754007415114867</td><td>0.4011308794971751</td><td>3.5902705711064433</td><td>0.18495618180647985</td><td>3.6515769151425177</td><td>1800.0</td></tr>
+<tr><td>2818.5062612291003</td><td>1.0006123790751411</td><td>nan</td><td>132604.0</td><td>3633667.8337860107</td><td>132604.0</td><td>47.862669053550725</td><td>0</td><td>3629836.3660213975</td><td>1.0</td><td>-2.178028470793757</td><td>0.4158838397829151</td><td>3.6286583440092626</td><td>0.18398511989486274</td><td>3.6807926875136756</td><td>1800.0</td></tr>
+<tr><td>2818.5266932855448</td><td>1.000732636547247</td><td>nan</td><td>132605.0</td><td>3633621.2506580353</td><td>132605.0</td><td>47.88206381294157</td><td>0</td><td>3630264.714549671</td><td>1.0</td><td>-2.180677830291881</td><td>0.4307296824817629</td><td>3.6672052609018317</td><td>0.18300735328132892</td><td>3.7101490047599226</td><td>1800.0</td></tr>
+<tr><td>2818.5675570991443</td><td>1.0006485538181358</td><td>nan</td><td>132607.0</td><td>3633000.380264282</td><td>132607.0</td><td>47.92869043255829</td><td>0</td><td>3629941.2857178226</td><td>1.0</td><td>-2.1860416381830308</td><td>0.460700764705989</td><td>3.7447776256523984</td><td>0.18103164903587343</td><td>3.7692844679799906</td><td>1800.0</td></tr>
+<tr><td>2818.587989156753</td><td>1.0005698599427024</td><td>nan</td><td>132608.0</td><td>3632872.1142292023</td><td>132608.0</td><td>47.89915853872955</td><td>0</td><td>3629646.2314486075</td><td>1.0</td><td>-2.1887561856997317</td><td>0.4758263790249837</td><td>3.7838036230084517</td><td>0.18003368294763394</td><td>3.799064211004942</td><td>1800.0</td></tr>
+<tr><td>2818.608421114368</td><td>1.0006106855242058</td><td>nan</td><td>132609.0</td><td>3632842.7295036316</td><td>132609.0</td><td>47.85585436947139</td><td>0</td><td>3629785.557085446</td><td>1.0</td><td>-2.1914925616796306</td><td>0.4910456253443005</td><td>3.8229898633504096</td><td>0.1790289552448402</td><td>3.8289856930072714</td><td>1800.0</td></tr>
+<tr><td>2818.6288530724487</td><td>1.0006010795024947</td><td>nan</td><td>132610.0</td><td>3632803.993894577</td><td>132610.0</td><td>47.8376854875877</td><td>0</td><td>3629741.491678547</td><td>1.0</td><td>-2.1942508156845624</td><td>0.5063586910607467</td><td>3.8623366214273016</td><td>0.1780174516993333</td><td>3.8590492125125495</td><td>1800.0</td></tr>
+<tr><td>2818.649285030988</td><td>1.0007452818397116</td><td>nan</td><td>132611.0</td><td>3633366.8895816803</td><td>132611.0</td><td>47.833337824186906</td><td>0</td><td>3630256.445741738</td><td>1.0</td><td>-2.1970309972763635</td><td>0.5217657635711228</td><td>3.901844171988155</td><td>0.17699915808295472</td><td>3.8892550680463343</td><td>1800.0</td></tr>
+<tr><td>2818.669716989767</td><td>1.0006993653052811</td><td>nan</td><td>132612.0</td><td>3633311.242116928</td><td>132612.0</td><td>47.82951294055048</td><td>0</td><td>3630080.2462951913</td><td>1.0</td><td>-2.1998331560168713</td><td>0.5372670302722362</td><td>3.9415127897820197</td><td>0.17597406016754435</td><td>3.9196035581342104</td><td>1800.0</td></tr>
+<tr><td>2818.690148948779</td><td>1.0005968151050437</td><td>nan</td><td>132613.0</td><td>3633454.115245819</td><td>132613.0</td><td>47.827956983168555</td><td>0</td><td>3629698.1108623846</td><td>1.0</td><td>-2.2026573414679183</td><td>0.5528626785608874</td><td>3.9813427495579212</td><td>0.1749421437249436</td><td>3.9500949813017323</td><td>1800.0</td></tr>
+<tr><td>2818.7105809082495</td><td>1.0005499870390169</td><td>nan</td><td>132614.0</td><td>3633572.709289551</td><td>132614.0</td><td>47.82878398536017</td><td>524288</td><td>3629518.451740521</td><td>1.0</td><td>-2.2055036031913446</td><td>0.5685528958338841</td><td>4.021334326064893</td><td>0.1739033945269926</td><td>3.980729636074492</td><td>1800.0</td></tr>
+</table></div></div></div>
+</div>
+<section id="Alternatively,-build-the-lightcurve-from-files,-for-example-data-reduced-with-POLAR">
+<h3>Alternatively, build the lightcurve from files, for example data reduced with POLAR<a class="headerlink" href="#Alternatively,-build-the-lightcurve-from-files,-for-example-data-reduced-with-POLAR" title="Permalink to this headline">¶</a></h3>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">filelist</span> <span class="o">=</span> <span class="p">[</span><span class="n">your_files_here</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">lc_targ</span><span class="o">.</span><span class="n">build_lightcurve</span><span class="p">(</span><span class="n">filelist</span><span class="o">=</span><span class="n">filelist</span><span class="p">,</span> <span class="n">author</span><span class="o">=</span><span class="s1">'AUTHOR'</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="Plot-the-light-curve-for-a-quick-visualisation">
+<h3>Plot the light curve for a quick visualisation<a class="headerlink" href="#Plot-the-light-curve-for-a-quick-visualisation" title="Permalink to this headline">¶</a></h3>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">lc_targ</span><span class="o">.</span><span class="n">ts_stitch</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">lc_targ</span><span class="o">.</span><span class="n">ts_stitch</span><span class="p">[</span><span class="s1">'flux'</span><span class="p">],</span><span class="s1">'k.'</span><span class="p">,</span> <span class="n">markersize</span><span class="o">=</span><span class="mf">1.8</span><span class="p">,</span> <span class="n">alpha</span> <span class="o">=</span> <span class="mf">0.25</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">'Time [</span><span class="si">{}</span><span class="s1">]'</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">lc_targ</span><span class="o">.</span><span class="n">ts_stitch</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">format</span><span class="p">)</span><span class="o">.</span><span class="n">upper</span><span class="p">()))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">'Flux'</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="n">lc_targ</span><span class="o">.</span><span class="n">K2</span> <span class="o">+</span> <span class="s1">' Lightcurve'</span><span class="p">)</span>
+<span class="c1"># plt.xlim(2350,2356)</span>
+<span class="c1"># plt.ylim(0.9985,1.0015)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/example_K2-109_12_0.png" src="_images/example_K2-109_12_0.png"/>
+</div>
+</div>
+</section>
+<section id="Mask-Outliers">
+<h3>Mask Outliers<a class="headerlink" href="#Mask-Outliers" title="Permalink to this headline">¶</a></h3>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">m1</span> <span class="o">=</span> <span class="n">lc_targ</span><span class="o">.</span><span class="n">mask_outliers</span><span class="p">(</span><span class="n">sigma</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<section id="Plot-the-light-curve-with-outliers-highlighted">
+<h4>Plot the light curve with outliers highlighted<a class="headerlink" href="#Plot-the-light-curve-with-outliers-highlighted" title="Permalink to this headline">¶</a></h4>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">lc_targ</span><span class="o">.</span><span class="n">ts_stitch</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">lc_targ</span><span class="o">.</span><span class="n">ts_stitch</span><span class="p">[</span><span class="s1">'flux'</span><span class="p">],</span><span class="s1">'k.'</span><span class="p">,</span> <span class="n">markersize</span><span class="o">=</span><span class="mf">1.8</span><span class="p">,</span> <span class="n">alpha</span> <span class="o">=</span> <span class="mf">0.25</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">lc_targ</span><span class="o">.</span><span class="n">ts_stitch</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">value</span><span class="p">[</span><span class="o">~</span><span class="n">m1</span><span class="p">],</span> <span class="n">lc_targ</span><span class="o">.</span><span class="n">ts_stitch</span><span class="p">[</span><span class="s1">'flux'</span><span class="p">][</span><span class="o">~</span><span class="n">m1</span><span class="p">],</span><span class="s1">'o'</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">'xkcd:orange'</span><span class="p">,</span> <span class="n">markersize</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">alpha</span> <span class="o">=</span> <span class="mf">0.5</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">'Time [</span><span class="si">{}</span><span class="s1">]'</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">lc_targ</span><span class="o">.</span><span class="n">ts_stitch</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">format</span><span class="p">)</span><span class="o">.</span><span class="n">upper</span><span class="p">()))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">'Flux'</span><span class="p">)</span>
+<span class="c1"># plt.xlim(2350,2356)</span>
+<span class="c1"># plt.ylim(0.985,1.015)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/example_K2-109_16_0.png" src="_images/example_K2-109_16_0.png"/>
+</div>
+</div>
+</section>
+<section id="Remove-the-outliers-if-necessary.">
+<h4>Remove the outliers if necessary.<a class="headerlink" href="#Remove-the-outliers-if-necessary." title="Permalink to this headline">¶</a></h4>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">lc_targ</span><span class="o">.</span><span class="n">ts_stitch</span> <span class="o">=</span> <span class="n">lc_targ</span><span class="o">.</span><span class="n">ts_stitch</span><span class="p">[</span><span class="n">m1</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+</section>
+</section>
+</section>
+<section id="Clean-the-light-curve-/-correct-activity">
+<h2>Clean the light curve / correct activity<a class="headerlink" href="#Clean-the-light-curve-/-correct-activity" title="Permalink to this headline">¶</a></h2>
+<section id="Using-a-Savistzky-Golay-filter:">
+<h3>Using a Savistzky-Golay filter:<a class="headerlink" href="#Using-a-Savistzky-Golay-filter:" title="Permalink to this headline">¶</a></h3>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">lc_targ</span><span class="o">.</span><span class="n">clean_subt_activity_flatten</span><span class="p">(</span><span class="n">sigma</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+        <span class="n">wl</span><span class="o">=</span><span class="mi">37</span><span class="p">,</span>
+        <span class="n">time_window</span><span class="o">=</span><span class="mi">18</span><span class="o">*</span><span class="n">u</span><span class="o">.</span><span class="n">h</span><span class="p">,</span>
+        <span class="n">polyorder</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+        <span class="n">return_trend</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">remove_outliers</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">break_tolerance</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+        <span class="n">niters</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+        <span class="n">mask</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+
+<span class="c1"># You might face issues with Astropy &gt;= 5.0 where flatten gives TypeError: "cannot write to unmasked output"</span>
+<span class="c1"># The issue comes from Lightkurve and a pull request has been made: https://github.com/lightkurve/lightkurve/pull/1162/commits/05034f4bbd8e6a40f8efd9cfa1f108a36ddc0872</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div><i>TimeSeries length=2476</i>
+<div class="table-wrapper"><table class="table-striped table-bordered table-condensed" id="table139895250128704">
+<thead><tr><th>time</th><th>flux</th><th>flux_err</th><th>cadn</th><th>fraw</th><th>cadenceno</th><th>fraw_err</th><th>quality</th><th>fcor</th><th>cbv01</th><th>cbv02</th><th>cbv03</th><th>cbv04</th><th>cbv05</th><th>cbv06</th><th>exptime</th></tr></thead>
+<thead><tr><th></th><th></th><th></th><th></th><th>electron / s</th><th></th><th>electron / s</th><th></th><th>electron / s</th><th></th><th></th><th></th><th></th><th></th><th></th><th>s</th></tr></thead>
+<thead><tr><th>Time</th><th>float64</th><th>float64</th><th>float64</th><th>float64</th><th>float64</th><th>float64</th><th>int32</th><th>float64</th><th>float64</th><th>float64</th><th>float64</th><th>float64</th><th>float64</th><th>float64</th><th>float64</th></tr></thead>
+<tr><td>2749.5899533941338</td><td>0.9974494072046971</td><td>nan</td><td>129231.0</td><td>3616934.469760895</td><td>129231.0</td><td>47.413345756122425</td><td>524288</td><td>3618895.8239213014</td><td>1.0</td><td>4.032601813062183</td><td>3.721325487340294</td><td>-0.6272998722503135</td><td>2.7580352239694506</td><td>0.9449693607767682</td><td>1800.0</td></tr>
+<tr><td>2749.6103854284593</td><td>0.9974552745389408</td><td>nan</td><td>129232.0</td><td>3616898.694656372</td><td>129232.0</td><td>47.4206060553783</td><td>0</td><td>3618797.79577493</td><td>1.0</td><td>4.036445303100602</td><td>3.709970058424757</td><td>-0.639482652969744</td><td>2.7337745018705517</td><td>0.9413711769034284</td><td>1800.0</td></tr>
+<tr><td>2749.6308173623256</td><td>0.9976185472245636</td><td>nan</td><td>129233.0</td><td>3617448.0032958984</td><td>129233.0</td><td>47.43482627636655</td><td>0</td><td>3619268.647123106</td><td>1.0</td><td>4.040263871939855</td><td>3.698637940508874</td><td>-0.6516019999249221</td><td>2.7095909556591535</td><td>0.9377823016121527</td><td>1800.0</td></tr>
+<tr><td>2749.6512491959584</td><td>0.997603175397708</td><td>nan</td><td>129234.0</td><td>3617286.1815719604</td><td>129234.0</td><td>47.44625835297297</td><td>0</td><td>3619093.66213457</td><td>1.0</td><td>4.044057555765272</td><td>3.687329095681801</td><td>-0.6636580207756357</td><td>2.685484485807006</td><td>0.9342027182885964</td><td>1800.0</td></tr>
+<tr><td>2749.6716812293525</td><td>0.9979626771452772</td><td>nan</td><td>129235.0</td><td>3618496.683452606</td><td>129235.0</td><td>47.469152065594365</td><td>0</td><td>3620273.5298203984</td><td>1.0</td><td>4.047826390762182</td><td>3.676043486032692</td><td>-0.6756508231816731</td><td>2.6614549927858597</td><td>0.930632410318415</td><td>1800.0</td></tr>
+<tr><td>2749.6921131622876</td><td>0.9980468850219955</td><td>nan</td><td>129236.0</td><td>3618750.0302505493</td><td>129236.0</td><td>47.48211093867445</td><td>0</td><td>3620458.2428743644</td><td>1.0</td><td>4.051570413115917</td><td>3.664781073650703</td><td>-0.6875805148028225</td><td>2.6375023770674657</td><td>0.9270713610872642</td><td>1800.0</td></tr>
+<tr><td>2749.712544994756</td><td>0.9981303806009645</td><td>nan</td><td>129237.0</td><td>3618955.9937667847</td><td>129237.0</td><td>47.49448540389917</td><td>0</td><td>3620640.277803066</td><td>1.0</td><td>4.055289659011805</td><td>3.6535418206249886</td><td>-0.6994472032988717</td><td>2.613626539123574</td><td>0.9235195539807992</td><td>1800.0</td></tr>
+<tr><td>2749.732977027219</td><td>0.9982988878195049</td><td>nan</td><td>129238.0</td><td>3619466.253112793</td><td>129238.0</td><td>47.507834395667736</td><td>0</td><td>3621129.43718082</td><td>1.0</td><td>4.058984164635178</td><td>3.642325689044705</td><td>-0.7112509963296089</td><td>2.589827379425935</td><td>0.9199769723846757</td><td>1800.0</td></tr>
+<tr><td>2749.75340895899</td><td>0.9983333476478541</td><td>nan</td><td>129239.0</td><td>3619449.8608169556</td><td>129239.0</td><td>47.52051862733021</td><td>0</td><td>3621134.0445883283</td><td>1.0</td><td>4.062653966171363</td><td>3.6311326409990063</td><td>-0.7229920015548223</td><td>2.5661047984463004</td><td>0.916443599684549</td><td>1800.0</td></tr>
+<tr><td>2749.77384079076</td><td>0.9984499681560839</td><td>nan</td><td>129240.0</td><td>3619830.804801941</td><td>129240.0</td><td>47.54148128608888</td><td>0</td><td>3621435.4665627684</td><td>1.0</td><td>4.0662990998056925</td><td>3.6199626385770487</td><td>-0.7346703266342999</td><td>2.5424586966564195</td><td>0.9129194192660746</td><td>1800.0</td></tr>
+<tr><td>2749.7942728220587</td><td>0.9984158515428457</td><td>nan</td><td>129241.0</td><td>3619638.970149994</td><td>129241.0</td><td>47.56157806813444</td><td>0</td><td>3621192.074435645</td><td>1.0</td><td>4.0699196017234955</td><td>3.6088156438679864</td><td>-0.7462860792278299</td><td>2.5188889745280436</td><td>0.909404414514908</td><td>1800.0</td></tr>
+<tr><td>2749.8147047528983</td><td>0.9985262651628759</td><td>nan</td><td>129242.0</td><td>3620092.708744049</td><td>129242.0</td><td>47.5904070351304</td><td>0</td><td>3621470.8624807484</td><td>1.0</td><td>4.073515508110102</td><td>3.5976916189609756</td><td>-0.7578393669952004</td><td>2.4953955325329225</td><td>0.9058985688167047</td><td>1800.0</td></tr>
+<tr><td>2749.835136583737</td><td>0.9986285723716373</td><td>nan</td><td>129243.0</td><td>3620588.7246055603</td><td>129243.0</td><td>47.61261592531867</td><td>4202496</td><td>3621720.249503433</td><td>1.0</td><td>4.077086855150842</td><td>3.5865905259451702</td><td>-0.7693302975961993</td><td>2.4719782711428078</td><td>0.9024018655571202</td><td>1800.0</td></tr>
+<tr><td>2749.8555686138716</td><td>0.9988300845596197</td><td>nan</td><td>129244.0</td><td>3621590.49723053</td><td>129244.0</td><td>47.63446913691414</td><td>0</td><td>3622327.9723254293</td><td>1.0</td><td>4.080633679031045</td><td>3.5755123269097266</td><td>-0.780758978690615</td><td>2.448637090829449</td><td>0.89891428812181</td><td>1800.0</td></tr>
+<tr><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td></tr>
+<tr><td>2818.404101452441</td><td>0.9999724442966103</td><td>nan</td><td>132599.0</td><td>3633293.7000579834</td><td>132599.0</td><td>47.82186261899401</td><td>0</td><td>3629823.601130887</td><td>1.0</td><td>-2.165105135304227</td><td>0.3430441145492126</td><td>3.4383054244120492</td><td>0.18877366699696385</td><td>3.5361133038974453</td><td>1800.0</td></tr>
+<tr><td>2818.42453350703</td><td>0.9999040570091818</td><td>nan</td><td>132600.0</td><td>3633612.672267914</td><td>132600.0</td><td>47.82432371418381</td><td>0</td><td>3629576.2479759958</td><td>1.0</td><td>-2.1676468393414416</td><td>0.35742741915056153</td><td>3.476059368846186</td><td>0.1878292816114223</td><td>3.564769882023916</td><td>1800.0</td></tr>
+<tr><td>2818.444965362083</td><td>0.9998691434778788</td><td>nan</td><td>132601.0</td><td>3633727.3173980713</td><td>132601.0</td><td>47.82989274571733</td><td>0</td><td>3629448.307331349</td><td>1.0</td><td>-2.170209975347164</td><td>0.3719028565778023</td><td>3.5139713582739436</td><td>0.18687824843660028</td><td>3.593565810923214</td><td>1800.0</td></tr>
+<tr><td>2818.4653973173627</td><td>0.999941946949921</td><td>nan</td><td>132602.0</td><td>3634014.084197998</td><td>132602.0</td><td>47.8402087450808</td><td>0</td><td>3629709.8239144934</td><td>1.0</td><td>-2.1727945928832346</td><td>0.3864706142277389</td><td>3.5520416674443522</td><td>0.18592055324433898</td><td>3.622501389120891</td><td>1800.0</td></tr>
+<tr><td>2818.485829373116</td><td>0.9999180958967169</td><td>nan</td><td>132603.0</td><td>3633582.8075580597</td><td>132603.0</td><td>47.849561180741254</td><td>0</td><td>3629617.440560636</td><td>1.0</td><td>-2.1754007415114867</td><td>0.4011308794971751</td><td>3.5902705711064433</td><td>0.18495618180647985</td><td>3.6515769151425177</td><td>1800.0</td></tr>
+<tr><td>2818.5062612291003</td><td>0.9999804764132937</td><td>nan</td><td>132604.0</td><td>3633667.8337860107</td><td>132604.0</td><td>47.862669053550725</td><td>0</td><td>3629836.3660213975</td><td>1.0</td><td>-2.178028470793757</td><td>0.4158838397829151</td><td>3.6286583440092626</td><td>0.18398511989486274</td><td>3.6807926875136756</td><td>1800.0</td></tr>
+<tr><td>2818.5266932855448</td><td>1.0001010771465841</td><td>nan</td><td>132605.0</td><td>3633621.2506580353</td><td>132605.0</td><td>47.88206381294157</td><td>0</td><td>3630264.714549671</td><td>1.0</td><td>-2.180677830291881</td><td>0.4307296824817629</td><td>3.6672052609018317</td><td>0.18300735328132892</td><td>3.7101490047599226</td><td>1800.0</td></tr>
+<tr><td>2818.5675570991443</td><td>1.0000180904455735</td><td>nan</td><td>132607.0</td><td>3633000.380264282</td><td>132607.0</td><td>47.92869043255829</td><td>0</td><td>3629941.2857178226</td><td>1.0</td><td>-2.1860416381830308</td><td>0.460700764705989</td><td>3.7447776256523984</td><td>0.18103164903587343</td><td>3.7692844679799906</td><td>1800.0</td></tr>
+<tr><td>2818.587989156753</td><td>0.9999411127814223</td><td>nan</td><td>132608.0</td><td>3632872.1142292023</td><td>132608.0</td><td>47.89915853872955</td><td>0</td><td>3629646.2314486075</td><td>1.0</td><td>-2.1887561856997317</td><td>0.4758263790249837</td><td>3.7838036230084517</td><td>0.18003368294763394</td><td>3.799064211004942</td><td>1800.0</td></tr>
+<tr><td>2818.608421114368</td><td>0.9999842031862137</td><td>nan</td><td>132609.0</td><td>3632842.7295036316</td><td>132609.0</td><td>47.85585436947139</td><td>0</td><td>3629785.557085446</td><td>1.0</td><td>-2.1914925616796306</td><td>0.4910456253443005</td><td>3.8229898633504096</td><td>0.1790289552448402</td><td>3.8289856930072714</td><td>1800.0</td></tr>
+<tr><td>2818.6288530724487</td><td>0.9999775174168674</td><td>nan</td><td>132610.0</td><td>3632803.993894577</td><td>132610.0</td><td>47.8376854875877</td><td>0</td><td>3629741.491678547</td><td>1.0</td><td>-2.1942508156845624</td><td>0.5063586910607467</td><td>3.8623366214273016</td><td>0.1780174516993333</td><td>3.8590492125125495</td><td>1800.0</td></tr>
+<tr><td>2818.649285030988</td><td>1.0001251684302048</td><td>nan</td><td>132611.0</td><td>3633366.8895816803</td><td>132611.0</td><td>47.833337824186906</td><td>0</td><td>3630256.445741738</td><td>1.0</td><td>-2.1970309972763635</td><td>0.5217657635711228</td><td>3.901844171988155</td><td>0.17699915808295472</td><td>3.8892550680463343</td><td>1800.0</td></tr>
+<tr><td>2818.669716989767</td><td>1.0000834425946967</td><td>nan</td><td>132612.0</td><td>3633311.242116928</td><td>132612.0</td><td>47.82951294055048</td><td>0</td><td>3630080.2462951913</td><td>1.0</td><td>-2.1998331560168713</td><td>0.5372670302722362</td><td>3.9415127897820197</td><td>0.17597406016754435</td><td>3.9196035581342104</td><td>1800.0</td></tr>
+<tr><td>2818.690148948779</td><td>0.999985741152896</td><td>nan</td><td>132613.0</td><td>3633454.115245819</td><td>132613.0</td><td>47.827956983168555</td><td>0</td><td>3629698.1108623846</td><td>1.0</td><td>-2.2026573414679183</td><td>0.5528626785608874</td><td>3.9813427495579212</td><td>0.1749421437249436</td><td>3.9500949813017323</td><td>1800.0</td></tr>
+<tr><td>2818.7105809082495</td><td>0.9999443509089974</td><td>nan</td><td>132614.0</td><td>3633572.709289551</td><td>132614.0</td><td>47.82878398536017</td><td>524288</td><td>3629518.451740521</td><td>1.0</td><td>-2.2055036031913446</td><td>0.5685528958338841</td><td>4.021334326064893</td><td>0.1739033945269926</td><td>3.980729636074492</td><td>1800.0</td></tr>
+</table></div></div></div>
+</div>
+</section>
+<section id="Alternatively,-using-GP:">
+<h3>Alternatively, using GP:<a class="headerlink" href="#Alternatively,-using-GP:" title="Permalink to this headline">¶</a></h3>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">lc_targ</span><span class="o">.</span><span class="n">clean_subt_activity_GP</span><span class="p">(</span>
+            <span class="n">timeseries</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">bin_duration</span><span class="o">=</span><span class="mi">60</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">min</span><span class="p">,</span>
+            <span class="n">period_min</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span>
+            <span class="n">period_max</span><span class="o">=</span><span class="mf">100.0</span><span class="p">,</span>
+            <span class="n">tune</span><span class="o">=</span><span class="mi">2500</span><span class="p">,</span>
+            <span class="n">draws</span><span class="o">=</span><span class="mi">2500</span><span class="p">,</span>
+            <span class="n">chains</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+            <span class="n">target_accept</span><span class="o">=</span><span class="mf">0.95</span><span class="p">,</span>
+            <span class="n">ncores</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">return_trend</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">remove_outliers</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">sigma_out</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+            <span class="n">mask</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+ /home/jrodrigues/fulmar_venv/lib64/python3.9/site-packages/astropy/timeseries/downsample.py:28: RuntimeWarning: Mean of empty slice /home/jrodrigues/fulmar_venv/lib64/python3.9/site-packages/astropy/timeseries/downsample.py:26: RuntimeWarning: Mean of empty slice /home/jrodrigues/fulmar_venv/lib64/python3.9/site-packages/astropy/timeseries/downsample.py:29: RuntimeWarning: Mean of empty slice
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+guessed period is 24.03185320009876 days
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+optimizing logp for variables: [f, log_dQ, log_Q0, log_period, sigma_rot, rho, sigma, log_jitter, mean]
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style>
+        /* Turns off some styling */
+        progress {
+            /* gets rid of default border in Firefox and Opera. */
+            border: none;
+            /* Needs to be in here for Safari polyfill so background images work as expected. */
+            background-size: auto;
+        }
+        .progress-bar-interrupted, .progress-bar-interrupted::-webkit-progress-bar {
+            background: #F44336;
+        }
+    </style>
+<progress class="" max="36" style="width:300px; height:20px; vertical-align: middle;" value="36"></progress>
+  100.00% [36/36 00:00&lt;00:00 logp = -2.258e+03]
+</div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+message: Optimization terminated successfully.
+logp: -2793.754777544708 -&gt; -2258.111803771446
+Multiprocess sampling (2 chains in 8 jobs)
+NUTS: [f, log_dQ, log_Q0, log_period, sigma_rot, rho, sigma, log_jitter, mean]
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style>
+        /* Turns off some styling */
+        progress {
+            /* gets rid of default border in Firefox and Opera. */
+            border: none;
+            /* Needs to be in here for Safari polyfill so background images work as expected. */
+            background-size: auto;
+        }
+        .progress-bar-interrupted, .progress-bar-interrupted::-webkit-progress-bar {
+            background: #F44336;
+        }
+    </style>
+<progress class="" max="10000" style="width:300px; height:20px; vertical-align: middle;" value="10000"></progress>
+  100.00% [10000/10000 01:57&lt;00:00 Sampling 2 chains, 0 divergences]
+</div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Sampling 2 chains for 2_500 tune and 2_500 draw iterations (5_000 + 5_000 draws total) took 118 seconds.
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div><i>TimeSeries length=2480</i>
+<div class="table-wrapper"><table class="table-striped table-bordered table-condensed" id="table139839289705616">
+<thead><tr><th>time</th><th>flux</th><th>flux_err</th><th>cadn</th><th>fraw</th><th>cadenceno</th><th>fraw_err</th><th>quality</th><th>fcor</th><th>cbv01</th><th>cbv02</th><th>cbv03</th><th>cbv04</th><th>cbv05</th><th>cbv06</th><th>exptime</th></tr></thead>
+<thead><tr><th></th><th></th><th></th><th></th><th>electron / s</th><th></th><th>electron / s</th><th></th><th>electron / s</th><th></th><th></th><th></th><th></th><th></th><th></th><th>s</th></tr></thead>
+<thead><tr><th>object</th><th>float64</th><th>float64</th><th>float64</th><th>float64</th><th>float64</th><th>float64</th><th>int32</th><th>float64</th><th>float64</th><th>float64</th><th>float64</th><th>float64</th><th>float64</th><th>float64</th><th>float64</th></tr></thead>
+<tr><td>2749.5899533941338</td><td>0.998349433848371</td><td>nan</td><td>129231.0</td><td>3616934.469760895</td><td>129231.0</td><td>47.413345756122425</td><td>524288</td><td>3618895.8239213014</td><td>1.0</td><td>4.032601813062183</td><td>3.721325487340294</td><td>-0.6272998722503135</td><td>2.7580352239694506</td><td>0.9449693607767682</td><td>1800.0</td></tr>
+<tr><td>2749.6103854284593</td><td>0.9983187622396653</td><td>nan</td><td>129232.0</td><td>3616898.694656372</td><td>129232.0</td><td>47.4206060553783</td><td>0</td><td>3618797.79577493</td><td>1.0</td><td>4.036445303100602</td><td>3.709970058424757</td><td>-0.639482652969744</td><td>2.7337745018705517</td><td>0.9413711769034284</td><td>1800.0</td></tr>
+<tr><td>2749.6308173623256</td><td>0.9984457325683745</td><td>nan</td><td>129233.0</td><td>3617448.0032958984</td><td>129233.0</td><td>47.43482627636655</td><td>0</td><td>3619268.647123106</td><td>1.0</td><td>4.040263871939855</td><td>3.698637940508874</td><td>-0.6516019999249221</td><td>2.7095909556591535</td><td>0.9377823016121527</td><td>1800.0</td></tr>
+<tr><td>2749.6512491959584</td><td>0.9983939071581265</td><td>nan</td><td>129234.0</td><td>3617286.1815719604</td><td>129234.0</td><td>47.44625835297297</td><td>0</td><td>3619093.66213457</td><td>1.0</td><td>4.044057555765272</td><td>3.687329095681801</td><td>-0.6636580207756357</td><td>2.685484485807006</td><td>0.9342027182885964</td><td>1800.0</td></tr>
+<tr><td>2749.6716812293525</td><td>0.9987166345406551</td><td>nan</td><td>129235.0</td><td>3618496.683452606</td><td>129235.0</td><td>47.469152065594365</td><td>0</td><td>3620273.5298203984</td><td>1.0</td><td>4.047826390762182</td><td>3.676043486032692</td><td>-0.6756508231816731</td><td>2.6614549927858597</td><td>0.930632410318415</td><td>1800.0</td></tr>
+<tr><td>2749.6921131622876</td><td>0.9987638059203047</td><td>nan</td><td>129236.0</td><td>3618750.0302505493</td><td>129236.0</td><td>47.48211093867445</td><td>0</td><td>3620458.2428743644</td><td>1.0</td><td>4.051570413115917</td><td>3.664781073650703</td><td>-0.6875805148028225</td><td>2.6375023770674657</td><td>0.9270713610872642</td><td>1800.0</td></tr>
+<tr><td>2749.712544994756</td><td>0.998809794888955</td><td>nan</td><td>129237.0</td><td>3618955.9937667847</td><td>129237.0</td><td>47.49448540389917</td><td>0</td><td>3620640.277803066</td><td>1.0</td><td>4.055289659011805</td><td>3.6535418206249886</td><td>-0.6994472032988717</td><td>2.613626539123574</td><td>0.9235195539807992</td><td>1800.0</td></tr>
+<tr><td>2749.732977027219</td><td>0.9989407930835639</td><td>nan</td><td>129238.0</td><td>3619466.253112793</td><td>129238.0</td><td>47.507834395667736</td><td>0</td><td>3621129.43718082</td><td>1.0</td><td>4.058984164635178</td><td>3.642325689044705</td><td>-0.7112509963296089</td><td>2.589827379425935</td><td>0.9199769723846757</td><td>1800.0</td></tr>
+<tr><td>2749.75340895899</td><td>0.9989372786791572</td><td>nan</td><td>129239.0</td><td>3619449.8608169556</td><td>129239.0</td><td>47.52051862733021</td><td>0</td><td>3621134.0445883283</td><td>1.0</td><td>4.062653966171363</td><td>3.6311326409990063</td><td>-0.7229920015548223</td><td>2.5661047984463004</td><td>0.916443599684549</td><td>1800.0</td></tr>
+<tr><td>2749.77384079076</td><td>0.9990159099433658</td><td>nan</td><td>129240.0</td><td>3619830.804801941</td><td>129240.0</td><td>47.54148128608888</td><td>0</td><td>3621435.4665627684</td><td>1.0</td><td>4.0662990998056925</td><td>3.6199626385770487</td><td>-0.7346703266342999</td><td>2.5424586966564195</td><td>0.9129194192660746</td><td>1800.0</td></tr>
+<tr><td>2749.7942728220587</td><td>0.998943158158829</td><td>nan</td><td>129241.0</td><td>3619638.970149994</td><td>129241.0</td><td>47.56157806813444</td><td>0</td><td>3621192.074435645</td><td>1.0</td><td>4.0699196017234955</td><td>3.6088156438679864</td><td>-0.7462860792278299</td><td>2.5188889745280436</td><td>0.909404414514908</td><td>1800.0</td></tr>
+<tr><td>2749.8147047528983</td><td>0.9990148906745702</td><td>nan</td><td>129242.0</td><td>3620092.708744049</td><td>129242.0</td><td>47.5904070351304</td><td>0</td><td>3621470.8624807484</td><td>1.0</td><td>4.073515508110102</td><td>3.5976916189609756</td><td>-0.7578393669952004</td><td>2.4953955325329225</td><td>0.9058985688167047</td><td>1800.0</td></tr>
+<tr><td>2749.835136583737</td><td>0.9990779456926332</td><td>nan</td><td>129243.0</td><td>3620588.7246055603</td><td>129243.0</td><td>47.61261592531867</td><td>4202496</td><td>3621720.249503433</td><td>1.0</td><td>4.077086855150842</td><td>3.5865905259451702</td><td>-0.7693302975961993</td><td>2.4719782711428078</td><td>0.9024018655571202</td><td>1800.0</td></tr>
+<tr><td>2749.8555686138716</td><td>0.9992400840159591</td><td>nan</td><td>129244.0</td><td>3621590.49723053</td><td>129244.0</td><td>47.63446913691414</td><td>0</td><td>3622327.9723254293</td><td>1.0</td><td>4.080633679031045</td><td>3.5755123269097266</td><td>-0.780758978690615</td><td>2.448637090829449</td><td>0.89891428812181</td><td>1800.0</td></tr>
+<tr><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td></tr>
+<tr><td>2818.404101452441</td><td>0.9997083659963285</td><td>nan</td><td>132599.0</td><td>3633293.7000579834</td><td>132599.0</td><td>47.82186261899401</td><td>0</td><td>3629823.601130887</td><td>1.0</td><td>-2.165105135304227</td><td>0.3430441145492126</td><td>3.4383054244120492</td><td>0.18877366699696385</td><td>3.5361133038974453</td><td>1800.0</td></tr>
+<tr><td>2818.42453350703</td><td>0.9996423445755372</td><td>nan</td><td>132600.0</td><td>3633612.672267914</td><td>132600.0</td><td>47.82432371418381</td><td>0</td><td>3629576.2479759958</td><td>1.0</td><td>-2.1676468393414416</td><td>0.35742741915056153</td><td>3.476059368846186</td><td>0.1878292816114223</td><td>3.564769882023916</td><td>1800.0</td></tr>
+<tr><td>2818.444965362083</td><td>0.9996091702784011</td><td>nan</td><td>132601.0</td><td>3633727.3173980713</td><td>132601.0</td><td>47.82989274571733</td><td>0</td><td>3629448.307331349</td><td>1.0</td><td>-2.170209975347164</td><td>0.3719028565778023</td><td>3.5139713582739436</td><td>0.18687824843660028</td><td>3.593565810923214</td><td>1800.0</td></tr>
+<tr><td>2818.4653973173627</td><td>0.9996831983733262</td><td>nan</td><td>132602.0</td><td>3634014.084197998</td><td>132602.0</td><td>47.8402087450808</td><td>0</td><td>3629709.8239144934</td><td>1.0</td><td>-2.1727945928832346</td><td>0.3864706142277389</td><td>3.5520416674443522</td><td>0.18592055324433898</td><td>3.622501389120891</td><td>1800.0</td></tr>
+<tr><td>2818.485829373116</td><td>0.9996599733968752</td><td>nan</td><td>132603.0</td><td>3633582.8075580597</td><td>132603.0</td><td>47.849561180741254</td><td>0</td><td>3629617.440560636</td><td>1.0</td><td>-2.1754007415114867</td><td>0.4011308794971751</td><td>3.5902705711064433</td><td>0.18495618180647985</td><td>3.6515769151425177</td><td>1800.0</td></tr>
+<tr><td>2818.5062612291003</td><td>0.9997223116728409</td><td>nan</td><td>132604.0</td><td>3633667.8337860107</td><td>132604.0</td><td>47.862669053550725</td><td>0</td><td>3629836.3660213975</td><td>1.0</td><td>-2.178028470793757</td><td>0.4158838397829151</td><td>3.6286583440092626</td><td>0.18398511989486274</td><td>3.6807926875136756</td><td>1800.0</td></tr>
+<tr><td>2818.5266932855448</td><td>0.9998422314448273</td><td>nan</td><td>132605.0</td><td>3633621.2506580353</td><td>132605.0</td><td>47.88206381294157</td><td>0</td><td>3630264.714549671</td><td>1.0</td><td>-2.180677830291881</td><td>0.4307296824817629</td><td>3.6672052609018317</td><td>0.18300735328132892</td><td>3.7101490047599226</td><td>1800.0</td></tr>
+<tr><td>2818.5675570991443</td><td>0.9997582398366757</td><td>nan</td><td>132607.0</td><td>3633000.380264282</td><td>132607.0</td><td>47.92869043255829</td><td>0</td><td>3629941.2857178226</td><td>1.0</td><td>-2.1860416381830308</td><td>0.460700764705989</td><td>3.7447776256523984</td><td>0.18103164903587343</td><td>3.7692844679799906</td><td>1800.0</td></tr>
+<tr><td>2818.587989156753</td><td>0.9996797398181987</td><td>nan</td><td>132608.0</td><td>3632872.1142292023</td><td>132608.0</td><td>47.89915853872955</td><td>0</td><td>3629646.2314486075</td><td>1.0</td><td>-2.1887561856997317</td><td>0.4758263790249837</td><td>3.7838036230084517</td><td>0.18003368294763394</td><td>3.799064211004942</td><td>1800.0</td></tr>
+<tr><td>2818.608421114368</td><td>0.9997206621332078</td><td>nan</td><td>132609.0</td><td>3632842.7295036316</td><td>132609.0</td><td>47.85585436947139</td><td>0</td><td>3629785.557085446</td><td>1.0</td><td>-2.1914925616796306</td><td>0.4910456253443005</td><td>3.8229898633504096</td><td>0.1790289552448402</td><td>3.8289856930072714</td><td>1800.0</td></tr>
+<tr><td>2818.6288530724487</td><td>0.9997112588233211</td><td>nan</td><td>132610.0</td><td>3632803.993894577</td><td>132610.0</td><td>47.8376854875877</td><td>0</td><td>3629741.491678547</td><td>1.0</td><td>-2.1942508156845624</td><td>0.5063586910607467</td><td>3.8623366214273016</td><td>0.1780174516993333</td><td>3.8590492125125495</td><td>1800.0</td></tr>
+<tr><td>2818.649285030988</td><td>0.9998555351226522</td><td>nan</td><td>132611.0</td><td>3633366.8895816803</td><td>132611.0</td><td>47.833337824186906</td><td>0</td><td>3630256.445741738</td><td>1.0</td><td>-2.1970309972763635</td><td>0.5217657635711228</td><td>3.901844171988155</td><td>0.17699915808295472</td><td>3.8892550680463343</td><td>1800.0</td></tr>
+<tr><td>2818.669716989767</td><td>0.9998098925720524</td><td>nan</td><td>132612.0</td><td>3633311.242116928</td><td>132612.0</td><td>47.82951294055048</td><td>0</td><td>3630080.2462951913</td><td>1.0</td><td>-2.1998331560168713</td><td>0.5372670302722362</td><td>3.9415127897820197</td><td>0.17597406016754435</td><td>3.9196035581342104</td><td>1800.0</td></tr>
+<tr><td>2818.690148948779</td><td>0.9997076723433814</td><td>nan</td><td>132613.0</td><td>3633454.115245819</td><td>132613.0</td><td>47.827956983168555</td><td>0</td><td>3629698.1108623846</td><td>1.0</td><td>-2.2026573414679183</td><td>0.5528626785608874</td><td>3.9813427495579212</td><td>0.1749421437249436</td><td>3.9500949813017323</td><td>1800.0</td></tr>
+<tr><td>2818.7105809082495</td><td>0.9996609323036864</td><td>nan</td><td>132614.0</td><td>3633572.709289551</td><td>132614.0</td><td>47.82878398536017</td><td>524288</td><td>3629518.451740521</td><td>1.0</td><td>-2.2055036031913446</td><td>0.5685528958338841</td><td>4.021334326064893</td><td>0.1739033945269926</td><td>3.980729636074492</td><td>1800.0</td></tr>
+</table></div></div></div>
+</div>
+</section>
+<section id="Plot-the-corrected-light-curve">
+<h3>Plot the corrected light curve<a class="headerlink" href="#Plot-the-corrected-light-curve" title="Permalink to this headline">¶</a></h3>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">lc_targ</span><span class="o">.</span><span class="n">ts_clean</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">lc_targ</span><span class="o">.</span><span class="n">ts_clean</span><span class="p">[</span><span class="s1">'flux'</span><span class="p">],</span><span class="s1">'k.'</span><span class="p">,</span> <span class="n">markersize</span><span class="o">=</span><span class="mf">1.8</span><span class="p">,</span> <span class="n">alpha</span> <span class="o">=</span> <span class="mf">0.25</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">'Time [</span><span class="si">{}</span><span class="s1">]'</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">lc_targ</span><span class="o">.</span><span class="n">ts_stitch</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">format</span><span class="p">)</span><span class="o">.</span><span class="n">upper</span><span class="p">()))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">'Flux'</span><span class="p">)</span>
+<span class="c1"># plt.xlim(2350,2356)</span>
+<span class="c1"># plt.ylim(0.985,1.015)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/example_K2-109_25_0.png" src="_images/example_K2-109_25_0.png"/>
+</div>
+</div>
+<section id="Looks-like-there’s-something-wrong-at-the-begginning-of-our-data.-For-now,-lets-mask-it-out.">
+<h4>Looks like there’s something wrong at the begginning of our data. For now, lets mask it out.<a class="headerlink" href="#Looks-like-there’s-something-wrong-at-the-begginning-of-our-data.-For-now,-lets-mask-it-out." title="Permalink to this headline">¶</a></h4>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">debut_mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">lc_targ</span><span class="o">.</span><span class="n">ts_clean</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">value</span> <span class="o">&lt;</span> <span class="mf">2752.5</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</section>
+</section>
+</section>
+<section id="Look-for-transits-using-TLS">
+<h2>Look for transits using TLS<a class="headerlink" href="#Look-for-transits-using-TLS" title="Permalink to this headline">¶</a></h2>
+<section id="Look-for-the-first-exoplanet">
+<h3>Look for the first exoplanet<a class="headerlink" href="#Look-for-the-first-exoplanet" title="Permalink to this headline">¶</a></h3>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">perio_results1</span> <span class="o">=</span> <span class="n">lc_targ</span><span class="o">.</span><span class="n">tls_periodogram</span><span class="p">(</span><span class="n">cleaned</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">n_transits_min</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">mask</span><span class="o">=</span><span class="n">debut_mask</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Transit Least Squares TLS 1.0.31 (22 Nov 2021)
+Creating model cache for 44 durations
+Searching 2342 data points, 6881 periods from 0.602 to 33.099 days
+Using all 8 CPU threads
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+100%|██████████████████████████████████████████████████████████████████| 6881/6881 periods | 00:20&lt;00:00
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Searching for best T0 for period 21.06392 days
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+ /home/jrodrigues/testenv/lib64/python3.9/site-packages/transitleastsquares-1.0.31-py3.9.egg/transitleastsquares/main.py:411: UserWarning: 1 of 3 transits without data. The true period may be twice the given period.
+</pre></div></div>
+</div>
+<section id="Plot-the-TLS-periodogram">
+<h4>Plot the TLS periodogram<a class="headerlink" href="#Plot-the-TLS-periodogram" title="Permalink to this headline">¶</a></h4>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">fulmar</span><span class="o">.</span><span class="n">perioplot</span><span class="p">(</span><span class="n">perio_results1</span><span class="p">,</span> <span class="n">lc_targ</span><span class="o">.</span><span class="n">K2</span><span class="p">,</span> <span class="n">folder</span><span class="o">=</span><span class="s2">"K2-109/"</span><span class="p">,</span> <span class="n">pl_n</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">maxper</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">savefig</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/example_K2-109_32_0.png" src="_images/example_K2-109_32_0.png"/>
+</div>
+</div>
+</section>
+<section id="Plot-the-resulting-model-to-have-a-quick-visual-check">
+<h4>Plot the resulting model to have a quick visual check<a class="headerlink" href="#Plot-the-resulting-model-to-have-a-quick-visual-check" title="Permalink to this headline">¶</a></h4>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">fulmar</span><span class="o">.</span><span class="n">modelplot</span><span class="p">(</span><span class="n">lc_targ</span><span class="o">.</span><span class="n">tls_results</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/example_K2-109_34_0.png" src="_images/example_K2-109_34_0.png"/>
+</div>
+</div>
+</section>
+<section id="Optimize-the-transit-parameters.-Be-careful-it-assumes-circular-orbit">
+<h4>Optimize the transit parameters. <strong>Be careful it assumes circular orbit</strong><a class="headerlink" href="#Optimize-the-transit-parameters.-Be-careful-it-assumes-circular-orbit" title="Permalink to this headline">¶</a></h4>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">p</span><span class="p">,</span> <span class="n">t0</span><span class="p">,</span> <span class="n">dur</span><span class="p">,</span> <span class="n">depth</span><span class="p">,</span> <span class="n">ab</span><span class="p">,</span> <span class="n">flat_samps</span> <span class="o">=</span> <span class="n">fulmar</span><span class="o">.</span><span class="n">params_optimizer</span><span class="p">(</span><span class="n">lc_targ</span><span class="o">.</span><span class="n">ts_clean</span><span class="p">,</span> <span class="n">lc_targ</span><span class="o">.</span><span class="n">tls_results</span><span class="o">.</span><span class="n">period</span><span class="p">,</span> <span class="n">lc_targ</span><span class="o">.</span><span class="n">tls_results</span><span class="o">.</span><span class="n">T0</span><span class="p">,</span> <span class="mi">1</span><span class="o">-</span><span class="n">lc_targ</span><span class="o">.</span><span class="n">tls_results</span><span class="o">.</span><span class="n">depth</span><span class="p">,</span> <span class="n">lc_targ</span><span class="o">.</span><span class="n">ab</span><span class="p">,</span> <span class="n">lc_targ</span><span class="o">.</span><span class="n">R_star</span><span class="p">,</span> <span class="n">lc_targ</span><span class="o">.</span><span class="n">K2</span><span class="p">,</span> <span class="n">tran_window</span><span class="o">=</span><span class="mf">0.25</span><span class="p">,</span> <span class="n">ncores</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">mask</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+running on 8 cores
+mean           -3.22
+log_ror        -3.22
+log_period     -0.92
+t0             -0.92
+log_dur        -3.22
+b_impact__     -1.39
+obs           215.17
+Name: Log-probability of test_point, dtype: float64
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+optimizing logp for variables: [log_dur, b, log_ror]
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area rendered_html docutils container">
+<style>
+    /* Turns off some styling */
+    progress {
+        /* gets rid of default border in Firefox and Opera. */
+        border: none;
+        /* Needs to be in here for Safari polyfill so background images work as expected. */
+        background-size: auto;
+    }
+    .progress-bar-interrupted, .progress-bar-interrupted::-webkit-progress-bar {
+        background: #F44336;
+    }
+</style></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<progress class="" max="34" style="width:300px; height:20px; vertical-align: middle;" value="34"></progress>
+  100.00% [34/34 00:00&lt;00:00 logp = 3.298e+02]
+</div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+message: Optimization terminated successfully.
+logp: 202.27788474824652 -&gt; 329.8381013996262
+optimizing logp for variables: [mean]
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area rendered_html docutils container">
+<style>
+    /* Turns off some styling */
+    progress {
+        /* gets rid of default border in Firefox and Opera. */
+        border: none;
+        /* Needs to be in here for Safari polyfill so background images work as expected. */
+        background-size: auto;
+    }
+    .progress-bar-interrupted, .progress-bar-interrupted::-webkit-progress-bar {
+        background: #F44336;
+    }
+</style></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<progress class="" max="4" style="width:300px; height:20px; vertical-align: middle;" value="4"></progress>
+  100.00% [4/4 00:00&lt;00:00 logp = 3.299e+02]
+</div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+message: Optimization terminated successfully.
+logp: 329.8381013996262 -&gt; 329.9332573296841
+optimizing logp for variables: [b, log_dur, t0, log_period, log_ror, mean]
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area rendered_html docutils container">
+<style>
+    /* Turns off some styling */
+    progress {
+        /* gets rid of default border in Firefox and Opera. */
+        border: none;
+        /* Needs to be in here for Safari polyfill so background images work as expected. */
+        background-size: auto;
+    }
+    .progress-bar-interrupted, .progress-bar-interrupted::-webkit-progress-bar {
+        background: #F44336;
+    }
+</style></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<progress class="" max="97" style="width:300px; height:20px; vertical-align: middle;" value="97"></progress>
+  100.00% [97/97 00:00&lt;00:00 logp = 3.353e+02]
+</div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+message: Desired error not necessarily achieved due to precision loss.
+logp: 329.9332573296841 -&gt; 335.29514335086077
+optimizing logp for variables: [b, log_dur, t0, log_period, log_ror, mean]
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area rendered_html docutils container">
+<style>
+    /* Turns off some styling */
+    progress {
+        /* gets rid of default border in Firefox and Opera. */
+        border: none;
+        /* Needs to be in here for Safari polyfill so background images work as expected. */
+        background-size: auto;
+    }
+    .progress-bar-interrupted, .progress-bar-interrupted::-webkit-progress-bar {
+        background: #F44336;
+    }
+</style></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<progress class="" max="106" style="width:300px; height:20px; vertical-align: middle;" value="106"></progress>
+  100.00% [106/106 00:00&lt;00:00 logp = 3.353e+02]
+</div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+message: Desired error not necessarily achieved due to precision loss.
+logp: 202.27788474824652 -&gt; 335.2951433508669
+Multiprocess sampling (2 chains in 8 jobs)
+NUTS: [b, log_dur, t0, log_period, log_ror, mean]
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area rendered_html docutils container">
+<style>
+    /* Turns off some styling */
+    progress {
+        /* gets rid of default border in Firefox and Opera. */
+        border: none;
+        /* Needs to be in here for Safari polyfill so background images work as expected. */
+        background-size: auto;
+    }
+    .progress-bar-interrupted, .progress-bar-interrupted::-webkit-progress-bar {
+        background: #F44336;
+    }
+</style></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<progress class="" max="10000" style="width:300px; height:20px; vertical-align: middle;" value="10000"></progress>
+  100.00% [10000/10000 00:56&lt;00:00 Sampling 2 chains, 0 divergences]
+</div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Sampling 2 chains for 2_500 tune and 2_500 draw iterations (5_000 + 5_000 draws total) took 58 seconds.
+The number of effective samples is smaller than 25% for some parameters.
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/example_K2-109_36_21.png" src="_images/example_K2-109_36_21.png"/>
+</div>
+</div>
+</section>
+<section id="Mask-intransit-data">
+<h4>Mask intransit data<a class="headerlink" href="#Mask-intransit-data" title="Permalink to this headline">¶</a></h4>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">intransit</span> <span class="o">=</span> <span class="n">transit_mask</span><span class="p">(</span><span class="n">lc_targ</span><span class="o">.</span><span class="n">ts_clean</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="mf">1.3</span><span class="o">*</span><span class="n">dur</span><span class="p">,</span> <span class="n">t0</span><span class="p">)</span> <span class="c1"># True when datapoints are in transit</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="Combine-intransit-mask-with-the-initial-mask">
+<h4>Combine intransit mask with the initial mask<a class="headerlink" href="#Combine-intransit-mask-with-the-initial-mask" title="Permalink to this headline">¶</a></h4>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">p1_mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logical_or</span><span class="p">(</span><span class="n">debut_mask</span><span class="p">,</span> <span class="n">intransit</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="Plot-the-lightcurve-with-transits-highlighted">
+<h4>Plot the lightcurve with transits highlighted<a class="headerlink" href="#Plot-the-lightcurve-with-transits-highlighted" title="Permalink to this headline">¶</a></h4>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">lc_targ</span><span class="o">.</span><span class="n">ts_clean</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">lc_targ</span><span class="o">.</span><span class="n">ts_clean</span><span class="p">[</span><span class="s1">'flux'</span><span class="p">],</span><span class="s1">'k.'</span><span class="p">,</span> <span class="n">markersize</span><span class="o">=</span><span class="mf">1.8</span><span class="p">,</span> <span class="n">alpha</span> <span class="o">=</span> <span class="mf">0.25</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">lc_targ</span><span class="o">.</span><span class="n">ts_clean</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">value</span><span class="p">[</span><span class="n">intransit</span><span class="p">],</span> <span class="n">lc_targ</span><span class="o">.</span><span class="n">ts_clean</span><span class="p">[</span><span class="s1">'flux'</span><span class="p">][</span><span class="n">intransit</span><span class="p">],</span><span class="s1">'o'</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">'xkcd:green'</span><span class="p">,</span> <span class="n">markersize</span><span class="o">=</span><span class="mf">4.8</span><span class="p">,</span> <span class="n">alpha</span> <span class="o">=</span> <span class="mf">0.5</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">'Time [</span><span class="si">{}</span><span class="s1">]'</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">lc_targ</span><span class="o">.</span><span class="n">ts_stitch</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">format</span><span class="p">)</span><span class="o">.</span><span class="n">upper</span><span class="p">()))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">'Flux'</span><span class="p">)</span>
+<span class="c1">#plt.xlim(2749,2752)</span>
+<span class="c1"># plt.ylim(0.985,1.015)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/example_K2-109_42_0.png" src="_images/example_K2-109_42_0.png"/>
+</div>
+</div>
+</section>
+</section>
+<section id="Look-for-the-second-exoplanet">
+<h3>Look for the second exoplanet<a class="headerlink" href="#Look-for-the-second-exoplanet" title="Permalink to this headline">¶</a></h3>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[21]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">perio_results2</span> <span class="o">=</span> <span class="n">lc_targ</span><span class="o">.</span><span class="n">tls_periodogram</span><span class="p">(</span><span class="n">cleaned</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">n_transits_min</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">period_min</span><span class="o">=</span><span class="mf">0.9</span><span class="p">,</span> <span class="n">mask</span><span class="o">=</span><span class="n">p1_mask</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Transit Least Squares TLS 1.0.31 (22 Nov 2021)
+Creating model cache for 44 durations
+Searching 2318 data points, 5707 periods from 0.9 to 33.099 days
+Using all 8 CPU threads
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+100%|██████████████████████████████████████████████████████████████████| 5707/5707 periods | 00:17&lt;00:00
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Searching for best T0 for period 9.55586 days
+</pre></div></div>
+</div>
+<section id="id1">
+<h4>Plot the TLS periodogram<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h4>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[22]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">fulmar</span><span class="o">.</span><span class="n">perioplot</span><span class="p">(</span><span class="n">perio_results2</span><span class="p">,</span> <span class="n">lc_targ</span><span class="o">.</span><span class="n">K2</span><span class="p">,</span> <span class="n">folder</span><span class="o">=</span><span class="s2">"K2-109/"</span><span class="p">,</span> <span class="n">pl_n</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">maxper</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">savefig</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="c1"># perioplot(results, lc_targ.K2, folder="K2-109/", num=1, maxper=50, savefig=False)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/example_K2-109_46_0.png" src="_images/example_K2-109_46_0.png"/>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[23]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">fulmar</span><span class="o">.</span><span class="n">modelplot</span><span class="p">(</span><span class="n">lc_targ</span><span class="o">.</span><span class="n">tls_results</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/example_K2-109_47_0.png" src="_images/example_K2-109_47_0.png"/>
+</div>
+</div>
+</section>
+<section id="Visualize-where-the-transits-lay-in-the-lightcurve">
+<h4>Visualize where the transits lay in the lightcurve<a class="headerlink" href="#Visualize-where-the-transits-lay-in-the-lightcurve" title="Permalink to this headline">¶</a></h4>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[24]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">lc_targ</span><span class="o">.</span><span class="n">ts_clean</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">value</span><span class="p">[</span><span class="o">~</span><span class="n">debut_mask</span><span class="p">],</span> <span class="n">lc_targ</span><span class="o">.</span><span class="n">ts_clean</span><span class="p">[</span><span class="s1">'flux'</span><span class="p">][</span><span class="o">~</span><span class="n">debut_mask</span><span class="p">],</span><span class="s1">'ko'</span><span class="p">,</span> <span class="n">markersize</span><span class="o">=</span><span class="mf">1.8</span><span class="p">,</span> <span class="n">alpha</span> <span class="o">=</span> <span class="mf">0.2</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">'Time [</span><span class="si">{}</span><span class="s1">]'</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">lc_targ</span><span class="o">.</span><span class="n">ts_stitch</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">format</span><span class="p">)</span><span class="o">.</span><span class="n">upper</span><span class="p">()))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">'Flux'</span><span class="p">)</span>
+<span class="c1">#plt.xlim(2749,2752)</span>
+<span class="c1"># plt.ylim(0.985,1.015)</span>
+
+<span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">perio_results1</span><span class="o">.</span><span class="n">transit_times</span><span class="p">:</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.4</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">ymax</span><span class="o">=</span><span class="mf">0.15</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">'xkcd:green'</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">perio_results2</span><span class="o">.</span><span class="n">transit_times</span><span class="p">:</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">ymax</span><span class="o">=</span><span class="mf">0.45</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">'xkcd:orange'</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="n">lc_targ</span><span class="o">.</span><span class="n">K2</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">(</span><span class="mf">0.9985</span><span class="p">,</span><span class="mf">1.00028</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/example_K2-109_49_0.png" src="_images/example_K2-109_49_0.png"/>
+</div>
+</div>
+</section>
+<section id="Optimize-the-transit-parameters.-Be-careful-it-still-assumes-circular-orbit">
+<h4>Optimize the transit parameters. <strong>Be careful it still assumes circular orbit</strong><a class="headerlink" href="#Optimize-the-transit-parameters.-Be-careful-it-still-assumes-circular-orbit" title="Permalink to this headline">¶</a></h4>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[25]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">p_1</span><span class="p">,</span> <span class="n">t0_1</span><span class="p">,</span> <span class="n">dur_1</span><span class="p">,</span> <span class="n">depth_1</span><span class="p">,</span> <span class="n">ab_1</span><span class="p">,</span> <span class="n">flat_samps_1</span> <span class="o">=</span> <span class="n">fulmar</span><span class="o">.</span><span class="n">params_optimizer</span><span class="p">(</span><span class="n">lc_targ</span><span class="o">.</span><span class="n">ts_clean</span><span class="p">,</span> <span class="n">lc_targ</span><span class="o">.</span><span class="n">tls_results</span><span class="o">.</span><span class="n">period</span><span class="p">,</span> <span class="n">lc_targ</span><span class="o">.</span><span class="n">tls_results</span><span class="o">.</span><span class="n">T0</span><span class="p">,</span> <span class="mi">1</span><span class="o">-</span><span class="n">lc_targ</span><span class="o">.</span><span class="n">tls_results</span><span class="o">.</span><span class="n">depth</span><span class="p">,</span> <span class="n">lc_targ</span><span class="o">.</span><span class="n">ab</span><span class="p">,</span> <span class="n">lc_targ</span><span class="o">.</span><span class="n">R_star</span><span class="p">,</span> <span class="n">lc_targ</span><span class="o">.</span><span class="n">K2</span><span class="p">,</span> <span class="n">tran_window</span><span class="o">=</span><span class="mf">0.25</span><span class="p">,</span> <span class="n">ncores</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">mask</span><span class="o">=~</span><span class="n">p1_mask</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+running on 8 cores
+mean           -3.22
+log_ror        -3.22
+log_period     -0.92
+t0             -0.92
+log_dur        -3.22
+b_impact__     -1.39
+obs           951.62
+Name: Log-probability of test_point, dtype: float64
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+optimizing logp for variables: [log_dur, b, log_ror]
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area rendered_html docutils container">
+<style>
+    /* Turns off some styling */
+    progress {
+        /* gets rid of default border in Firefox and Opera. */
+        border: none;
+        /* Needs to be in here for Safari polyfill so background images work as expected. */
+        background-size: auto;
+    }
+    .progress-bar-interrupted, .progress-bar-interrupted::-webkit-progress-bar {
+        background: #F44336;
+    }
+</style></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<progress class="" max="34" style="width:300px; height:20px; vertical-align: middle;" value="34"></progress>
+  100.00% [34/34 00:00&lt;00:00 logp = 9.923e+02]
+</div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+message: Optimization terminated successfully.
+logp: 938.7314070773815 -&gt; 992.3434057514368
+optimizing logp for variables: [mean]
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area rendered_html docutils container">
+<style>
+    /* Turns off some styling */
+    progress {
+        /* gets rid of default border in Firefox and Opera. */
+        border: none;
+        /* Needs to be in here for Safari polyfill so background images work as expected. */
+        background-size: auto;
+    }
+    .progress-bar-interrupted, .progress-bar-interrupted::-webkit-progress-bar {
+        background: #F44336;
+    }
+</style></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<progress class="" max="4" style="width:300px; height:20px; vertical-align: middle;" value="4"></progress>
+  100.00% [4/4 00:00&lt;00:00 logp = 9.979e+02]
+</div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+message: Optimization terminated successfully.
+logp: 992.3434057514368 -&gt; 997.8685515283529
+optimizing logp for variables: [b, log_dur, t0, log_period, log_ror, mean]
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area rendered_html docutils container">
+<style>
+    /* Turns off some styling */
+    progress {
+        /* gets rid of default border in Firefox and Opera. */
+        border: none;
+        /* Needs to be in here for Safari polyfill so background images work as expected. */
+        background-size: auto;
+    }
+    .progress-bar-interrupted, .progress-bar-interrupted::-webkit-progress-bar {
+        background: #F44336;
+    }
+</style></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<progress class="" max="118" style="width:300px; height:20px; vertical-align: middle;" value="118"></progress>
+  100.00% [118/118 00:00&lt;00:00 logp = 1.006e+03]
+</div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+message: Desired error not necessarily achieved due to precision loss.
+logp: 997.8685515283529 -&gt; 1005.5500559403897
+optimizing logp for variables: [b, log_dur, t0, log_period, log_ror, mean]
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area rendered_html docutils container">
+<style>
+    /* Turns off some styling */
+    progress {
+        /* gets rid of default border in Firefox and Opera. */
+        border: none;
+        /* Needs to be in here for Safari polyfill so background images work as expected. */
+        background-size: auto;
+    }
+    .progress-bar-interrupted, .progress-bar-interrupted::-webkit-progress-bar {
+        background: #F44336;
+    }
+</style></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<progress class="" max="119" style="width:300px; height:20px; vertical-align: middle;" value="119"></progress>
+  100.00% [119/119 00:00&lt;00:00 logp = 1.005e+03]
+</div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+message: Desired error not necessarily achieved due to precision loss.
+logp: 938.7314070773815 -&gt; 1005.3873774223697
+Multiprocess sampling (2 chains in 8 jobs)
+NUTS: [b, log_dur, t0, log_period, log_ror, mean]
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area rendered_html docutils container">
+<style>
+    /* Turns off some styling */
+    progress {
+        /* gets rid of default border in Firefox and Opera. */
+        border: none;
+        /* Needs to be in here for Safari polyfill so background images work as expected. */
+        background-size: auto;
+    }
+    .progress-bar-interrupted, .progress-bar-interrupted::-webkit-progress-bar {
+        background: #F44336;
+    }
+</style></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<progress class="" max="10000" style="width:300px; height:20px; vertical-align: middle;" value="10000"></progress>
+  100.00% [10000/10000 01:24&lt;00:00 Sampling 2 chains, 0 divergences]
+</div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Sampling 2 chains for 2_500 tune and 2_500 draw iterations (5_000 + 5_000 draws total) took 86 seconds.
+The number of effective samples is smaller than 10% for some parameters.
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/example_K2-109_51_21.png" src="_images/example_K2-109_51_21.png"/>
+</div>
+</div>
+</section>
+<section id="id2">
+<h4>Mask intransit data<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h4>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[26]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">intransit2</span> <span class="o">=</span> <span class="n">transit_mask</span><span class="p">(</span><span class="n">lc_targ</span><span class="o">.</span><span class="n">ts_clean</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">p_1</span><span class="p">,</span> <span class="mf">1.3</span><span class="o">*</span><span class="n">dur_1</span><span class="p">,</span> <span class="n">t0_1</span><span class="p">)</span> <span class="c1"># True when datapoints are in transit</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="id3">
+<h4>Combine intransit mask with the initial mask<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h4>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[27]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">p2_mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logical_or</span><span class="p">(</span><span class="n">p1_mask</span><span class="p">,</span> <span class="n">intransit2</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="id4">
+<h4>Plot the lightcurve with transits highlighted<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h4>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[28]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">lc_targ</span><span class="o">.</span><span class="n">ts_clean</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">value</span><span class="p">[</span><span class="o">~</span><span class="n">debut_mask</span><span class="p">],</span> <span class="n">lc_targ</span><span class="o">.</span><span class="n">ts_clean</span><span class="p">[</span><span class="s1">'flux'</span><span class="p">][</span><span class="o">~</span><span class="n">debut_mask</span><span class="p">],</span><span class="s1">'k.'</span><span class="p">,</span> <span class="n">markersize</span><span class="o">=</span><span class="mf">1.8</span><span class="p">,</span> <span class="n">alpha</span> <span class="o">=</span> <span class="mf">0.25</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">lc_targ</span><span class="o">.</span><span class="n">ts_clean</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">value</span><span class="p">[</span><span class="n">intransit2</span><span class="p">],</span> <span class="n">lc_targ</span><span class="o">.</span><span class="n">ts_clean</span><span class="p">[</span><span class="s1">'flux'</span><span class="p">][</span><span class="n">intransit2</span><span class="p">],</span><span class="s1">'o'</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">'xkcd:orange'</span><span class="p">,</span> <span class="n">markersize</span><span class="o">=</span><span class="mf">4.8</span><span class="p">,</span> <span class="n">alpha</span> <span class="o">=</span> <span class="mf">0.25</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">'K2-109b'</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">lc_targ</span><span class="o">.</span><span class="n">ts_clean</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">value</span><span class="p">[</span><span class="n">intransit</span><span class="p">],</span> <span class="n">lc_targ</span><span class="o">.</span><span class="n">ts_clean</span><span class="p">[</span><span class="s1">'flux'</span><span class="p">][</span><span class="n">intransit</span><span class="p">],</span><span class="s1">'o'</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">'xkcd:green'</span><span class="p">,</span> <span class="n">markersize</span><span class="o">=</span><span class="mf">4.8</span><span class="p">,</span> <span class="n">alpha</span> <span class="o">=</span> <span class="mf">0.25</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">'K2-109c'</span><span class="p">)</span>
+
+
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">'Time [</span><span class="si">{}</span><span class="s1">]'</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">lc_targ</span><span class="o">.</span><span class="n">ts_stitch</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">format</span><span class="p">)</span><span class="o">.</span><span class="n">upper</span><span class="p">()))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">'Flux'</span><span class="p">)</span>
+<span class="c1">#plt.xlim(2749,2752)</span>
+<span class="c1"># plt.ylim(0.985,1.015)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="n">lc_targ</span><span class="o">.</span><span class="n">K2</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/example_K2-109_57_0.png" src="_images/example_K2-109_57_0.png"/>
+</div>
+</div>
+</section>
+</section>
+<section id="Look-for-a-possible-third-exoplanet-?">
+<h3>Look for a possible third exoplanet ?<a class="headerlink" href="#Look-for-a-possible-third-exoplanet-?" title="Permalink to this headline">¶</a></h3>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[29]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">perio_results3</span> <span class="o">=</span> <span class="n">lc_targ</span><span class="o">.</span><span class="n">tls_periodogram</span><span class="p">(</span><span class="n">cleaned</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">n_transits_min</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">mask</span><span class="o">=</span><span class="n">p2_mask</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Transit Least Squares TLS 1.0.31 (22 Nov 2021)
+Creating model cache for 44 durations
+Searching 2266 data points, 6881 periods from 0.602 to 33.099 days
+Using all 8 CPU threads
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+100%|██████████████████████████████████████████████████████████████████| 6881/6881 periods | 00:15&lt;00:00
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Searching for best T0 for period 12.50044 days
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+ /home/jrodrigues/testenv/lib64/python3.9/site-packages/transitleastsquares-1.0.31-py3.9.egg/transitleastsquares/stats.py:458: RuntimeWarning: divide by zero encountered in double_scalars
+</pre></div></div>
+</div>
+<section id="id5">
+<h4>Plot the TLS periodogram<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h4>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[30]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">fulmar</span><span class="o">.</span><span class="n">perioplot</span><span class="p">(</span><span class="n">perio_results3</span><span class="p">,</span> <span class="n">lc_targ</span><span class="o">.</span><span class="n">K2</span><span class="p">,</span> <span class="n">folder</span><span class="o">=</span><span class="s2">"K2-109/"</span><span class="p">,</span> <span class="n">pl_n</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">maxper</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">savefig</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="c1"># perioplot(results, lc_targ.K2, folder="K2-109/", num=1, maxper=50, savefig=False)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/example_K2-109_61_0.png" src="_images/example_K2-109_61_0.png"/>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[31]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">fulmar</span><span class="o">.</span><span class="n">modelplot</span><span class="p">(</span><span class="n">lc_targ</span><span class="o">.</span><span class="n">tls_results</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/example_K2-109_62_0.png" src="_images/example_K2-109_62_0.png"/>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[32]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">perio_results3</span><span class="o">.</span><span class="n">SDE</span><span class="p">,</span> <span class="n">perio_results3</span><span class="o">.</span><span class="n">FAP</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[32]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+(7.933769512184782, 0.00160064)
+</pre></div></div>
+</div>
+<p><strong>SDE &lt; 9</strong>, which is the normally accepted threshold for a detection. We can end it there, as we can assume the system only contains two planets.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[33]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="nb">print</span><span class="p">(</span><span class="s2">"In the paper, K2-109b period is announced to be 9.55237 days, in our quick look we found it at </span><span class="si">{0:.5f}</span><span class="s2">.</span><span class="se">\n</span><span class="s2">Regarding K2-109c, the paper announces 21.05704 days, we found </span><span class="si">{1:.5f}</span><span class="s2">. </span><span class="se">\n</span><span class="s2">Not bad !"</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">p_1</span><span class="p">,</span> <span class="n">p</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+In the paper, K2-109b period is announced to be 9.55237 days, in our quick look we found it at 9.55405.
+Regarding K2-109c, the paper announces 21.05704 days, we found 21.05469.
+Not bad !
+</pre></div></div>
+</div>
+</section>
+</section>
+</section>
+<section id="Print-version-of-Fulmar">
+<h2>Print version of Fulmar<a class="headerlink" href="#Print-version-of-Fulmar" title="Permalink to this headline">¶</a></h2>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[34]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">fulmar</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">print_version</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Fulmar 0.1.8 (5 Apr 2022)
+</pre></div></div>
+</div>
+</section>
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          
+          <a class="prev-page" href="api.html">
+              <svg><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">API documentation</div>
+                
+              </div>
+            </a>
+        </div>
+
+        <div class="related-information">
+              Copyright &#169; 2021, José Rodrigues |
+          Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+          <a href="https://github.com/pradyunsg/furo">Furo theme</a>.
+            | <a class="muted-link" href="_sources/example_K2-109.ipynb.txt"
+               rel="nofollow">
+              Show Source
+            </a>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            Contents
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">Basic FULMAR usage. Using K2-109 as an example</a><ul>
+<li><a class="reference internal" href="#Define-target">Define target</a><ul>
+<li><a class="reference internal" href="#Update-stellar-parameters-if-necessary">Update stellar parameters if necessary</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#Build-the-lightcurve">Build the lightcurve</a><ul>
+<li><a class="reference internal" href="#Alternatively,-build-the-lightcurve-from-files,-for-example-data-reduced-with-POLAR">Alternatively, build the lightcurve from files, for example data reduced with POLAR</a></li>
+<li><a class="reference internal" href="#Plot-the-light-curve-for-a-quick-visualisation">Plot the light curve for a quick visualisation</a></li>
+<li><a class="reference internal" href="#Mask-Outliers">Mask Outliers</a><ul>
+<li><a class="reference internal" href="#Plot-the-light-curve-with-outliers-highlighted">Plot the light curve with outliers highlighted</a></li>
+<li><a class="reference internal" href="#Remove-the-outliers-if-necessary.">Remove the outliers if necessary.</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#Clean-the-light-curve-/-correct-activity">Clean the light curve / correct activity</a><ul>
+<li><a class="reference internal" href="#Using-a-Savistzky-Golay-filter:">Using a Savistzky-Golay filter:</a></li>
+<li><a class="reference internal" href="#Alternatively,-using-GP:">Alternatively, using GP:</a></li>
+<li><a class="reference internal" href="#Plot-the-corrected-light-curve">Plot the corrected light curve</a><ul>
+<li><a class="reference internal" href="#Looks-like-there’s-something-wrong-at-the-begginning-of-our-data.-For-now,-lets-mask-it-out.">Looks like there’s something wrong at the begginning of our data. For now, lets mask it out.</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#Look-for-transits-using-TLS">Look for transits using TLS</a><ul>
+<li><a class="reference internal" href="#Look-for-the-first-exoplanet">Look for the first exoplanet</a><ul>
+<li><a class="reference internal" href="#Plot-the-TLS-periodogram">Plot the TLS periodogram</a></li>
+<li><a class="reference internal" href="#Plot-the-resulting-model-to-have-a-quick-visual-check">Plot the resulting model to have a quick visual check</a></li>
+<li><a class="reference internal" href="#Optimize-the-transit-parameters.-Be-careful-it-assumes-circular-orbit">Optimize the transit parameters. <strong>Be careful it assumes circular orbit</strong></a></li>
+<li><a class="reference internal" href="#Mask-intransit-data">Mask intransit data</a></li>
+<li><a class="reference internal" href="#Combine-intransit-mask-with-the-initial-mask">Combine intransit mask with the initial mask</a></li>
+<li><a class="reference internal" href="#Plot-the-lightcurve-with-transits-highlighted">Plot the lightcurve with transits highlighted</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#Look-for-the-second-exoplanet">Look for the second exoplanet</a><ul>
+<li><a class="reference internal" href="#id1">Plot the TLS periodogram</a></li>
+<li><a class="reference internal" href="#Visualize-where-the-transits-lay-in-the-lightcurve">Visualize where the transits lay in the lightcurve</a></li>
+<li><a class="reference internal" href="#Optimize-the-transit-parameters.-Be-careful-it-still-assumes-circular-orbit">Optimize the transit parameters. <strong>Be careful it still assumes circular orbit</strong></a></li>
+<li><a class="reference internal" href="#id2">Mask intransit data</a></li>
+<li><a class="reference internal" href="#id3">Combine intransit mask with the initial mask</a></li>
+<li><a class="reference internal" href="#id4">Plot the lightcurve with transits highlighted</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#Look-for-a-possible-third-exoplanet-?">Look for a possible third exoplanet ?</a><ul>
+<li><a class="reference internal" href="#id5">Plot the TLS periodogram</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#Print-version-of-Fulmar">Print version of Fulmar</a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div><script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/scripts/furo.js"></script>
+    <script src="_static/clipboard.min.js"></script>
+    <script src="_static/copybutton.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    </body>
+</html>

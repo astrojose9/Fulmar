@@ -29,7 +29,7 @@ author = 'José Rodrigues'
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = ['sphinx.ext.autodoc', 'sphinx.ext.napoleon',
-              'sphinx.ext.intersphinx']
+              'sphinx.ext.intersphinx', 'nbsphinx', 'sphinx_copybutton']
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -55,7 +55,7 @@ html_theme = 'furo'
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = ['_static']
+html_static_path = ['source/_static']
 
 
 # html_logo = "FULMAR_logo_name.png"
@@ -87,20 +87,26 @@ html_theme_options = {
         "color-background-hover": "#1e2421ff",  # for navigation-item hover
         "color-background-hover--transparent": "#1e242100",
         "color-background-border": "#303335",  # for UI borders
+        "color-background-item": "#cccccc", # for "background" items (eg: copybutton)
         "color-brand-primary": "#02B01A",
         "color-brand-content": "#02B01A",
+
         "color-highlighted-background": "#086533",
 
         "color-guilabel-background": "#0863358",
         "color-guilabel-border": "#135f3980",
 
-        "color-api-highlight-on-target": "#330033",
+        "color-highlight-on-target": "#330033",
         "color-card-background": "#181a18",
 
         "color-problematic": "#51ee51",
+        "color-announcement-background": "#ccccccdd",
+        "color-announcement-text": "#eeebee",
     },
 }
 
+pygments_style = "sphinx"
+pygments_dark_style = "native"
 
 # intersphinx enables links to classes/functions in the packages defined here:
 intersphinx_mapping = {'python': ('https://docs.python.org/3/', None),

@@ -21,8 +21,9 @@ Check out the :doc:`Installation` section to start using FULMAR.
    :maxdepth: 2
 
    Installation
-   api
    Developer documentation
+   api
+   example_K2-109.ipynb
    Submit an issue <https://github.com/astrojose9/fulmar/issues>
    Source at Github <https://github.com/astrojose9/fulmar>
 

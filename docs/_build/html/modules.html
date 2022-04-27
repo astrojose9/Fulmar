@@ -9,6 +9,7 @@
         <title>FULMAR - FULMAR documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?digest=7f0192ddeb2adecfbaa87ffbcf67d16358b30bc1" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?digest=0af69da206d614734f649b27d4cdc2dd6c31f41d" />
     
     
@@ -16,7 +17,7 @@
 
 <style>
   body {
-    --color-code-background: #f8f8f8;
+    --color-code-background: #eeffcc;
   --color-code-foreground: black;
   --color-brand-primary: #02B01A;
   --color-brand-content: #02B01A;
@@ -35,14 +36,17 @@
   --color-background-hover: #1e2421ff;
   --color-background-hover--transparent: #1e242100;
   --color-background-border: #303335;
+  --color-background-item: #cccccc;
   --color-brand-primary: #02B01A;
   --color-brand-content: #02B01A;
   --color-highlighted-background: #086533;
   --color-guilabel-background: #0863358;
   --color-guilabel-border: #135f3980;
-  --color-api-highlight-on-target: #330033;
+  --color-highlight-on-target: #330033;
   --color-card-background: #181a18;
   --color-problematic: #51ee51;
+  --color-announcement-background: #ccccccdd;
+  --color-announcement-text: #eeebee;
   
   }
   @media (prefers-color-scheme: dark) {
@@ -58,14 +62,17 @@
   --color-background-hover: #1e2421ff;
   --color-background-hover--transparent: #1e242100;
   --color-background-border: #303335;
+  --color-background-item: #cccccc;
   --color-brand-primary: #02B01A;
   --color-brand-content: #02B01A;
   --color-highlighted-background: #086533;
   --color-guilabel-background: #0863358;
   --color-guilabel-border: #135f3980;
-  --color-api-highlight-on-target: #330033;
+  --color-highlight-on-target: #330033;
   --color-card-background: #181a18;
   --color-problematic: #51ee51;
+  --color-announcement-background: #ccccccdd;
+  --color-announcement-text: #eeebee;
   
     }
   }
@@ -196,8 +203,9 @@
 <div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
   <ul>
 <li class="toctree-l1"><a class="reference internal" href="Installation.html">Installation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="api.html">API documentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Developer%20documentation.html">Developer documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="example_K2-109.html">Basic FULMAR usage. Using K2-109 as an example</a></li>
 <li class="toctree-l1"><a class="reference external" href="https://github.com/astrojose9/fulmar/issues">Submit an issue</a></li>
 <li class="toctree-l1"><a class="reference external" href="https://github.com/astrojose9/fulmar">Source at Github</a></li>
 </ul>
@@ -714,8 +722,43 @@ Defaults to np.std(flux)</p></li>
 </dd></dl>
 <dl class="py function">
 <dt class="sig sig-object py" id="fulmar.params_optimizer">
-<span class="sig-name descname"><span class="pre">params_optimizer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">timeseries</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">period_guess</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t0_guess</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">depth_guess</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ab</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">r_star</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tran_window</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.25</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ncores</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fulmar.params_optimizer" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<span class="sig-name descname"><span class="pre">params_optimizer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">timeseries</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">period_guess</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t0_guess</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">depth_guess</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ab</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">r_star</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tran_window</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.25</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tune</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2500</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">draws</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2500</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">chains</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_accept</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.95</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ncores</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fulmar.params_optimizer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Translates the target identifiers between different catalogs
+such as TIC to TOI in the case of TESS or EPIC to KIC” for K2</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>timeseries</strong> (<cite>~astropy.timeseries.TimeSeries</cite>, optional) – TimeSeries object</p></li>
+<li><p><strong>period_guess</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a>) – Initial estimate of the orbital period</p></li>
+<li><p><strong>t0_guess</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a>) – Inital estimate of the mid-transit time
+of the first transit within the time series</p></li>
+<li><p><strong>depth_guess</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a>) – Initial estimate of the transit depth</p></li>
+<li><p><strong>ab</strong> (<em>tuple of floats</em>) – Quadratic limb darkening parameters a, b.</p></li>
+<li><p><strong>r_star</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a>) – Stellar radius (in units of solar radii).</p></li>
+<li><p><strong>target_id</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – Name of the target as a string</p></li>
+<li><p><strong>tran_window</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a>) – Window around the center of transits for efficiency (in units of days)</p></li>
+<li><p><strong>tune</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a><em>, </em><em>optional</em>) – number of tune iterations</p></li>
+<li><p><strong>draws</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a><em>, </em><em>optional</em>) – number of draws iterations</p></li>
+<li><p><strong>chains</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a><em>, </em><em>optional</em>) – number of chains to sample</p></li>
+<li><p><strong>target_accept</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a><em>, </em><em>optional</em>) – number should be between 0 and 1</p></li>
+<li><p><strong>ncores</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a><em>, </em><em>optional</em>) – Number of cores to use for processing. (Default: all)</p></li>
+<li><p><strong>mask</strong> (<em>boolean array with length of time</em>) – Boolean array to mask data, typically transits. Data where mask is
+“False” will not be taken into account for the fit.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>p</strong> (<em>float</em>) – Orbital period</p></li>
+<li><p><strong>t0</strong> (<em>float</em>) – Mid-transit time of the first transit within the time series</p></li>
+<li><p><em>dur</em> – Duration of the transit</p></li>
+<li><p><em>depth</em> – Depth of the transit</p></li>
+<li><p><strong>ab</strong> (<em>tuple of floats</em>) – Quadratic limb darkening parameters a, b.</p></li>
+<li><p><strong>flat_samps</strong> (<cite>xarray.core.dataset.Dataset</cite>)</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
 <dl class="py function">
 <dt class="sig sig-object py" id="fulmar.estimate_planet_mass">
 <span class="sig-name descname"><span class="pre">estimate_planet_mass</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">R_p</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rho_p</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fulmar.estimate_planet_mass" title="Permalink to this definition">¶</a></dt>
@@ -878,5 +921,8 @@ time system that is not affected by leap seconds.</p>
     <script src="_static/underscore.js"></script>
     <script src="_static/doctools.js"></script>
     <script src="_static/scripts/furo.js"></script>
+    <script src="_static/clipboard.min.js"></script>
+    <script src="_static/copybutton.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     </body>
 </html>

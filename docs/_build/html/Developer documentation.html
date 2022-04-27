@@ -3,12 +3,13 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
-<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="prev" title="API documentation" href="api.html" />
+<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="API documentation" href="api.html" /><link rel="prev" title="Installation" href="Installation.html" />
 
     <meta name="generator" content="sphinx-4.2.0, furo 2021.11.23"/>
         <title>Developer documentation - FULMAR documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?digest=7f0192ddeb2adecfbaa87ffbcf67d16358b30bc1" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?digest=0af69da206d614734f649b27d4cdc2dd6c31f41d" />
     
     
@@ -16,7 +17,7 @@
 
 <style>
   body {
-    --color-code-background: #f8f8f8;
+    --color-code-background: #eeffcc;
   --color-code-foreground: black;
   --color-brand-primary: #02B01A;
   --color-brand-content: #02B01A;
@@ -35,14 +36,17 @@
   --color-background-hover: #1e2421ff;
   --color-background-hover--transparent: #1e242100;
   --color-background-border: #303335;
+  --color-background-item: #cccccc;
   --color-brand-primary: #02B01A;
   --color-brand-content: #02B01A;
   --color-highlighted-background: #086533;
   --color-guilabel-background: #0863358;
   --color-guilabel-border: #135f3980;
-  --color-api-highlight-on-target: #330033;
+  --color-highlight-on-target: #330033;
   --color-card-background: #181a18;
   --color-problematic: #51ee51;
+  --color-announcement-background: #ccccccdd;
+  --color-announcement-text: #eeebee;
   
   }
   @media (prefers-color-scheme: dark) {
@@ -58,14 +62,17 @@
   --color-background-hover: #1e2421ff;
   --color-background-hover--transparent: #1e242100;
   --color-background-border: #303335;
+  --color-background-item: #cccccc;
   --color-brand-primary: #02B01A;
   --color-brand-content: #02B01A;
   --color-highlighted-background: #086533;
   --color-guilabel-background: #0863358;
   --color-guilabel-border: #135f3980;
-  --color-api-highlight-on-target: #330033;
+  --color-highlight-on-target: #330033;
   --color-card-background: #181a18;
   --color-problematic: #51ee51;
+  --color-announcement-background: #ccccccdd;
+  --color-announcement-text: #eeebee;
   
     }
   }
@@ -196,8 +203,9 @@
 <div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
   <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="Installation.html">Installation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="api.html">API documentation</a></li>
 <li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Developer documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="example_K2-109.html">Basic FULMAR usage. Using K2-109 as an example</a></li>
 <li class="toctree-l1"><a class="reference external" href="https://github.com/astrojose9/fulmar/issues">Submit an issue</a></li>
 <li class="toctree-l1"><a class="reference external" href="https://github.com/astrojose9/fulmar">Source at Github</a></li>
 </ul>
@@ -290,15 +298,23 @@ If you’re adding new functionality, make sure that you implement at least one 
       <footer>
         
         <div class="related-pages">
-          
-          <a class="prev-page" href="api.html">
+          <a class="next-page" href="api.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">API documentation</div>
+              </div>
+              <svg><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="Installation.html">
               <svg><use href="#svg-arrow-right"></use></svg>
               <div class="page-info">
                 <div class="context">
                   <span>Previous</span>
                 </div>
                 
-                <div class="title">API documentation</div>
+                <div class="title">Installation</div>
                 
               </div>
             </a>
@@ -351,5 +367,8 @@ If you’re adding new functionality, make sure that you implement at least one 
     <script src="_static/underscore.js"></script>
     <script src="_static/doctools.js"></script>
     <script src="_static/scripts/furo.js"></script>
+    <script src="_static/clipboard.min.js"></script>
+    <script src="_static/copybutton.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     </body>
 </html>
