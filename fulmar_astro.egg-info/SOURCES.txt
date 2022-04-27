@@ -109,14 +109,6 @@ docs/_build/html/_static/styles/furo-extensions.css.map
 docs/_build/html/_static/styles/furo.css
 docs/_build/html/_static/styles/furo.css.map
 docs/source/Developer documentation.rst
-docs/source/FULMAR_logo.png
-docs/source/FULMAR_logo_dark_mode.png
-docs/source/FULMAR_logo_light_mode.png
-docs/source/FULMAR_logo_name.png
-docs/source/FULMAR_logo_title.png
-docs/source/FULMAR_logo_title_clair.png
-docs/source/FULMAR_logo_title_dark_mode.png
-docs/source/FULMAR_logo_title_light_mode.png
 docs/source/Installation.rst
 docs/source/api.rst
 docs/source/conf.py
@@ -132,12 +124,14 @@ fulmar/Kepler2KIC.json
 fulmar/TIC2TOI.json
 fulmar/TOI2TIC.json
 fulmar/__init__.py
+fulmar/estimators.py
 fulmar/fulmar_constants.py
 fulmar/func.py
 fulmar/k2_cat.csv
 fulmar/kepler_cat.csv
 fulmar/main.py
 fulmar/mission_dic_manager.py
+fulmar/query.py
 fulmar/tess_cat.csv
 fulmar/time.py
 fulmar/utils.py

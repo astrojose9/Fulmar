@@ -784,7 +784,8 @@ class target:
             finflat = lc.flatten(window_length=wl, polyorder=polyorder,
                                  break_tolerance=break_tolerance, sigma=sigma,
                                  return_trend=True, niters=niters,
-                                 mask=np.logical_or(mask[mask_exp], clip.mask))
+                                 mask=np.logical_or(mask[mask_exp],
+                                                    np.array(clip.mask)))
 
             # clc1 = finflat[0]
             # trend_ts = TimeSeries(finflat[1])
