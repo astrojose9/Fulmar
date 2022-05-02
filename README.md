@@ -1,4 +1,4 @@
-![Logo](https://raw.githubusercontent.com/astrojose9/fulmar/main/docs/source/FULMAR_logo_title.png)
+![Logo](https://raw.githubusercontent.com/astrojose9/fulmar/main/docs/source/_images/FULMAR_logo_title.png)
 ### A modular tool for analyzing light curves in support of RV follow-up programs.
 [![PyPI - License](https://img.shields.io/pypi/l/fulmar-astro?color=brightgreen)](https://github.com/astrojose9/fulmar/blob/main/LICENSE) [![PyPI](https://img.shields.io/pypi/v/fulmar-astro?color=brightgreen)](https://pypi.org/project/fulmar-astro/) [![readthedocs](https://img.shields.io/badge/read%20the-docs-brightgreen)](https://fulmar-astro.readthedocs.io/en/latest/)
 
