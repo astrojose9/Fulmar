@@ -818,7 +818,8 @@ def GP_fit(time, flux, flux_err=None, mode='rotation',
 def params_optimizer(timeseries, period_guess, t0_guess, depth_guess, ab,
                      r_star, target_id, tran_window=0.25, tune=2500,
                      draws=2500, chains=2, target_accept=0.95,
-                     ncores=None, mask=None):
+                     ncores=None, mask=None, folder=None, pl_n='',
+                     savefig=False):
     """Translates the target identifiers between different catalogs
     such as TIC to TOI in the case of TESS or EPIC to KIC" for K2
 
@@ -854,6 +855,13 @@ def params_optimizer(timeseries, period_guess, t0_guess, depth_guess, ab,
     mask : boolean array with length of time
         Boolean array to mask data, typically transits. Data where mask is
         "False" will not be taken into account for the fit.
+    savefig : bool, optional
+        If True, the plot is saved on the disk. Default is False.
+    folder : str, optional
+        Path to the folder in which the figure can be saved. If None,
+        the folder will be the same as target_id
+    pl_n : int or str, optional
+        ID of the considered signal, e.g. "b". For the filename.
 
     Returns
     -------
@@ -1068,11 +1076,16 @@ def params_optimizer(timeseries, period_guess, t0_guess, depth_guess, ab,
         )
 
         plt.legend(fontsize=10, loc=4)
-        plt.title(target_id)
+        plt.title(target_id + str(pl_n))
         plt.xlim(-0.5 * p, 0.5 * p)
         plt.xlabel("time since transit [days]")
         plt.ylabel("de-trended flux")
         _ = plt.xlim(-tran_window, tran_window)
+        if savefig is True:
+            if folder is None:
+                folder = target_id + '/'
+            plt.savefig(folder + target_id + str(pl_n),
+                        facecolor='white', dpi=240)
         plt.show()
 
         return p, t0, dur, depth, ab, flat_samps

@@ -1,12 +1,12 @@
 Metadata-Version: 2.1
 Name: fulmar-astro
-Version: 0.1.8
+Version: 0.1.9
 Summary: Follow-Up Lightcurves Multitool Assisting Radial velocities
 Home-page: https://github.com/astrojose9/fulmar
 Author: José Rodrigues
 Author-email: jose.rodrigues@astro.up.pt
 License: MIT
-Description: ![Logo](https://raw.githubusercontent.com/astrojose9/fulmar/main/docs/source/FULMAR_logo_title.png)
+Description: ![Logo](https://raw.githubusercontent.com/astrojose9/fulmar/main/docs/source/_images/FULMAR_logo_title.png)
         ### A modular tool for analyzing light curves in support of RV follow-up programs.
         [![PyPI - License](https://img.shields.io/pypi/l/fulmar-astro?color=brightgreen)](https://github.com/astrojose9/fulmar/blob/main/LICENSE) [![PyPI](https://img.shields.io/pypi/v/fulmar-astro?color=brightgreen)](https://pypi.org/project/fulmar-astro/) [![readthedocs](https://img.shields.io/badge/read%20the-docs-brightgreen)](https://fulmar-astro.readthedocs.io/en/latest/)
         
