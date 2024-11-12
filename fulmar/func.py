@@ -316,10 +316,14 @@ def read_lc_from_file(
     if str(file).split('.')[-1] == 'fits':
         lc = lk.read(file)
     else:
+        # try:  # First try using astropy.table's autodetect
+        #     t_1 = Table.read(file)
+        # except IORegistryError:  # Helps the astropy reader
+        #     t_1 = Table.read(file, format='ascii', comment='#')
         try:  # First try using astropy.table's autodetect
-            t_1 = Table.read(file)
+            t_1 = Table.read(file, format='ascii', comment='#') # Helps the astropy reader
         except IORegistryError:  # Helps the astropy reader
-            t_1 = Table.read(file, format='ascii', comment='#')
+            t_1 = Table.read(file)
 
         if colnames is None:
             if t_1.colnames[0] == 'col1':
@@ -1133,6 +1137,7 @@ def perioplot(tls_results, target, folder, pl_n, maxper=None, savefig=False):
                  fontsize=12)
     ax.plot(tls_results.periods, tls_results.power, color='black', lw=0.5)
     plt.xlim(0, maxper)
+#     plt.ylim(0, 1.1 * tls_results.SDE)
     plt.tight_layout()
     if savefig is True:
         plt.savefig(

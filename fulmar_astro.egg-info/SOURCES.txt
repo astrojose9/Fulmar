@@ -133,6 +133,7 @@ fulmar/main.py
 fulmar/mission_dic_manager.py
 fulmar/query.py
 fulmar/tess_cat.csv
+fulmar/tess_cat_old.csv
 fulmar/time.py
 fulmar/utils.py
 fulmar/version.py
@@ -145,6 +146,7 @@ tests/simple_table.txt
 tests/simple_table_correct_cols.txt
 tests/simple_table_wrong_flux.txt
 tests/simple_table_wrong_t.txt
+tests/test_estimators.py
 tests/test_func.py
 tests/test_time.py
 tests/test_utils.py

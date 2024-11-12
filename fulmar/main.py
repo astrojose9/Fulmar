@@ -310,19 +310,25 @@ class target:
             self.author = author
 
         if self.mission == 'TESS':
-            self.srch = lk.search.search_lightcurve(
+            qry = lk.search.search_lightcurve(
                 self.TIC, exptime=self.exptime,
                 author=self.author, mission=self.mission)
+            srch_msk = np.array([str(self.TIC_num) in x for x in qry.target_name.data])
+            self.srch = qry[srch_msk]
 
         elif self.mission == 'Kepler':
-            self.srch = lk.search.search_lightcurve(
+            qry = lk.search.search_lightcurve(
                 self.KIC, exptime=self.exptime,
                 author=self.author, mission=self.mission)
+            srch_msk = np.array([str(self.KIC_num) in x for x in qry.target_name.data])
+            self.srch = qry[srch_msk]
 
         elif self.mission == 'K2':
-            self.srch = lk.search.search_lightcurve(
+            qry = lk.search.search_lightcurve(
                 self.EPIC, exptime=self.exptime,
                 author=self.author, mission=self.mission)
+            srch_msk = np.array([str(self.EPIC_num) in x for x in qry.target_name.data])
+            self.srch = qry[srch_msk]
 
         else:
             warnings.warn(self.mission, 'mission is not supported... yet(?)',
@@ -404,7 +410,7 @@ class target:
                 lc_col.append(read_lc_from_file(f, author=author,
                                                 exptime=exptime,
                                                 colnames=colnames))
-        stitched_lc = lc_col.stitch(corrector_func=lambda x: normalize_lc(x))
+        stitched_lc = lc_col.stitch(corrector_func=lambda x: normalize_lc(x))       
         self.ts_stitch = TimeSeries(stitched_lc)
         self.ts_stitch.sort('time')
         return self.ts_stitch
